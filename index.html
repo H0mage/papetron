@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Electron App</title>
+  </head>
+  <body>
+    <h1>Electron App</h1>
+    <form id="myForm">
+      <label for="directoryInput">Select a directory:</label>
+      <input type="file" id="directoryInput" name="directory" directory webkitdirectory>
+
+      <label for="intervalSelect">Select time interval:</label>
+      <select id="intervalSelect" name="interval">
+        <option value="30000">30 seconds</option>
+        <option value="60000">1 minute</option>
+        <option value="300000">5 minutes</option>
+        <option value="600000">10 minutes</option>
+      </select>
+
+      <label for="allowCollages">Allow Collages?</label>
+      <input type="checkbox" id="allowCollages" name="collages">
+
+      <label for="syncDisplays">Change all three displays at once?</label>
+      <input type="checkbox" id="syncDisplays" name="sync">
+
+      <button type="submit">Submit</button>
+    </form>
+
+    <script>
+      const { ipcRenderer } = require('electron');
+
+      const form = document.getElementById('myForm');
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const directory = document.getElementById('directoryInput').value;
+        console.log(directory);
+        const timeInterval = document.getElementById('intervalSelect').value;
+        console.log(timeInterval);
+        const collages = document.getElementById('allowCollages').value;
+        console.log(collages);
+        const displays = document.getElementById('syncDisplays').value;
+        console.log(displays);
+        ipcRenderer.send('form:submit', formValues);
+      });
+    </script>
+  </body>
+</html>
