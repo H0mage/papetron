@@ -1,8 +1,18 @@
 const { app, BrowserWindow, ipcMain } = require("electron");
+const Store = require("electron-store");
 const path = require("path");
 const url = require("url");
 
 let mainWindow;
+
+const defaults = {
+  timeInterval: 30000,
+  isCollage: true,
+  synchronizeDisplays: false,
+  directories: [],
+};
+
+const store = new Store({ defaults });
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -27,7 +37,10 @@ function createWindow() {
   });
 }
 
-app.on("ready", createWindow);
+app.on("ready", function () {
+  console.log(store.get("timeInterval"));
+  createWindow();
+});
 
 app.on("window-all-closed", function () {
   if (process.platform !== "darwin") {

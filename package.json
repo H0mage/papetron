@@ -20,6 +20,7 @@
   "homepage": "https://github.com/H0mage/papetron#readme",
   "dependencies": {
     "electron": "^24.4.0",
+    "electron-store": "^8.1.0",
     "jimp": "^0.22.8",
     "wallpaper": "^6.1.1"
   }

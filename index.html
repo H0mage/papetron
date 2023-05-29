@@ -8,7 +8,8 @@
     <h1>Electron App</h1>
     <form id="myForm">
       <label for="directoryInput">Select a directory:</label>
-      <input type="file" id="directoryInput" name="directory" directory webkitdirectory>
+      <input type="file" id="directoryInput" name="directory" directory webkitdirectory multiple>
+      <ul id="directoryList"></ul>
 
       <label for="intervalSelect">Select time interval:</label>
       <select id="intervalSelect" name="interval">
@@ -31,16 +32,55 @@
       const { ipcRenderer } = require('electron');
 
       const form = document.getElementById('myForm');
+
+      let directoryList = [];
+
+      document.getElementById("directoryInput").addEventListener(
+      "change",
+      (event) => {
+        console.log(event)
+        console.log(event.target.value)
+        console.log(event.target.files)
+        const files = event.target.files
+        if (files.length > 0) {
+          let list = document.getElementById("directoryList");
+          const path = files[0].path;
+          console.log(path);
+          const splitPath = path.split("\\");
+          console.log(splitPath)
+          splitPath.pop();
+          const finalPath = splitPath.join("\\")
+          console.log(finalPath)
+          directoryList.push(finalPath);
+          let item = document.createElement("li");
+          item.textContent = finalPath
+          list.appendChild(item)
+        }
+        // let output = document.getElementById("listing");
+        // for (const file of event.target.files) {
+        //   let item = document.createElement("li");
+        //   item.textContent = file.webkitRelativePath;
+        //   output.appendChild(item);
+        // }
+      },
+      false
+    );
+
       form.addEventListener('submit', (event) => {
         event.preventDefault();
-        const directory = document.getElementById('directoryInput').value;
-        console.log(directory);
+        console.log(directoryList)
         const timeInterval = document.getElementById('intervalSelect').value;
         console.log(timeInterval);
         const collages = document.getElementById('allowCollages').value;
         console.log(collages);
         const displays = document.getElementById('syncDisplays').value;
         console.log(displays);
+        const formValues = {
+          directoryList,
+          timeInterval,
+          isCollage: collages === 'on' ? true : false,
+          synchronizedDisplays: collages === 'on' ? true : false,
+        }
         ipcRenderer.send('form:submit', formValues);
       });
     </script>
