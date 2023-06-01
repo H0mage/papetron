@@ -66,6 +66,13 @@ function App() {
     // setUserSettings(formData);
   };
 
+  const removeDirectoryHandler = (index) => {
+    console.log("you want to delete me", index);
+    const directoriesCopy = directories.slice();
+    directoriesCopy.splice(index, 1);
+    setDirectories(directoriesCopy);
+  };
+
   return (
     <div className="App">
       <header className="App-header">
@@ -82,7 +89,16 @@ function App() {
           style={{ color: "rgba(0, 0, 0, 0)" }}
         />
         <p>Selected Directories: </p>
-        <div>{directories ? directories.map((e) => <li>{e}</li>) : ""}</div>
+        <div>
+          {directories
+            ? directories.map((directory, index) => (
+                <li key={index} name={index} className="directoryItem">
+                  {directory}{" "}
+                  <span onClick={() => removeDirectoryHandler(index)}>X</span>
+                </li>
+              ))
+            : ""}
+        </div>
         <label>
           Time Interval:
           <select
