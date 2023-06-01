@@ -14,4 +14,5 @@ contextBridge.exposeInMainWorld("Settings", {
   isCollage: () => store.get("isCollage"),
   syncDisplays: () => store.get("syncDisplays"),
   settings: () => ipcRenderer.invoke("settings").then((result) => result),
+  saveSettings: (formData) => ipcRenderer.send("save:settings", formData),
 });

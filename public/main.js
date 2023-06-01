@@ -9,6 +9,7 @@ function createWindow() {
     height: 600,
     webPreferences: {
       nodeIntegration: true,
+      enableRemoteModule: true,
       preload: path.join(__dirname, "preload.js"),
     },
   });
@@ -50,7 +51,11 @@ app.on("activate", () => {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
-ipcMain.on("form:submit", function (event, formData) {
-  console.log(formData);
+ipcMain.on("save:settings", function (event, formData) {
+  console.log("newData from submit", formData);
   setUserSettings(formData);
+});
+
+ipcMain.on("settings:saved", function (event, message) {
+  console.log(getUserSettings());
 });

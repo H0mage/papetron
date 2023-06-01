@@ -1,5 +1,4 @@
 const Store = require("electron-store");
-const { ipcRenderer } = require("electron");
 const storage = new Store();
 
 function getUserSettings() {
@@ -36,7 +35,6 @@ function setUserSettings(formData) {
   storage.set("timeInterval", formData.timeInterval);
   storage.set("isCollage", formData.isCollage);
   storage.set("syncDisplays", formData.syncDisplays);
-  ipcRenderer.send("form:submit", formData);
 }
 
 module.exports = {

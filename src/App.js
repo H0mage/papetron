@@ -1,5 +1,7 @@
 import "./App.css";
 import React, { useState, useEffect } from "react";
+// const { ipcRenderer } = window.require("electron");
+// import { ipcRenderer } from "electron";
 // import { setUserSettings } from "./settings";
 
 function App() {
@@ -40,18 +42,11 @@ function App() {
   const handleCheck = (event) => {
     console.log(event.target.value);
     console.log(event.target.name);
-    if (event.target.value === "on") {
-      if (event.target.name === "isCollage") {
-        setIsCollage(true);
-      } else if (event.target.name === "syncDisplays") {
-        setSyncDisplays(true);
-      }
-    } else {
-      if (event.target.name === "isCollage") {
-        setIsCollage(false);
-      } else if (event.target.name === "syncDisplays") {
-        setSyncDisplays(false);
-      }
+    console.log(event.target.checked);
+    if (event.target.name === "isCollage") {
+      setIsCollage(event.target.checked);
+    } else if (event.target.name === "syncDisplays") {
+      setSyncDisplays(event.target.checked);
     }
   };
 
@@ -65,6 +60,7 @@ function App() {
       isCollage,
       syncDisplays,
     };
+    window.Settings.saveSettings(formData);
     // setUserSettings(formData);
   };
 
@@ -102,7 +98,7 @@ function App() {
             type="checkbox"
             name="isCollage"
             onChange={handleCheck}
-            value={isCollage ? "on" : "off"}
+            checked={isCollage}
           />
           Collage Images?
         </label>
@@ -111,7 +107,7 @@ function App() {
             type="checkbox"
             name="syncDisplays"
             onChange={handleCheck}
-            value={syncDisplays ? "on" : "off"}
+            checked={syncDisplays}
           />
           Sync Displays?
         </label>
