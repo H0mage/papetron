@@ -32,7 +32,9 @@ function App() {
     console.log(directory);
     directory.pop();
     const finalPath = directory.join("\\");
-    setDirectories(finalPath);
+    event.target.value = null;
+    event.target.files = null;
+    setDirectories([...directories, finalPath]);
   };
 
   const handleSelect = (event) => {
@@ -77,8 +79,10 @@ function App() {
           webkitdirectory=""
           multiple=""
           onChange={handleDirectoryChange}
+          style={{ color: "rgba(0, 0, 0, 0)" }}
         />
-        <p>Selected Directories: {directories}</p>
+        <p>Selected Directories: </p>
+        <div>{directories ? directories.map((e) => <li>{e}</li>) : ""}</div>
         <label>
           Time Interval:
           <select
