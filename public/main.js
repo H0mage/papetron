@@ -1,5 +1,6 @@
 const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
+const fs = require("fs");
 const { getUserSettings, setUserSettings } = require("../src/settings");
 
 function createWindow() {
@@ -58,4 +59,33 @@ ipcMain.on("save:settings", function (event, formData) {
 
 ipcMain.on("settings:saved", function (event, message) {
   console.log(getUserSettings());
+});
+
+ipcMain.on("papetron:start", function (event) {
+  console.log("starto");
+  const settings = getUserSettings();
+  const directories = settings.directories;
+  console.log(directories);
+  fs.readdir(directories[0], (err, files) => {
+    const chosenImage = files[Math.floor(Math.random() * files.length)];
+    const splitPath = directories[0].split("\\");
+    splitPath.push(chosenImage);
+    const imagePath = splitPath.join("\\");
+    console.log(imagePath);
+    // setWallpaper(imagePath);
+    import("wallpaper").then((wallpaper) => {
+      wallpaper
+        .setWallpaper(imagePath)
+        .then(() => {
+          console.log("Success");
+        })
+        .catch((err) => {
+          console.log("Error:", err);
+        });
+    });
+  });
+});
+
+ipcMain.on("papetron:stop", function (event) {
+  console.log("stoppo");
 });

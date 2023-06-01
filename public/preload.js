@@ -3,7 +3,7 @@ const Store = require("electron-store");
 
 const store = new Store();
 
-const { setUserSettings, getUserSettings } = require("../src/settings");
+const { getUserSettings } = require("../src/settings");
 
 const settings = getUserSettings();
 console.log("settings", settings);
@@ -15,4 +15,9 @@ contextBridge.exposeInMainWorld("Settings", {
   syncDisplays: () => store.get("syncDisplays"),
   settings: () => ipcRenderer.invoke("settings").then((result) => result),
   saveSettings: (formData) => ipcRenderer.send("save:settings", formData),
+});
+
+contextBridge.exposeInMainWorld("Papetron", {
+  start: () => ipcRenderer.send("papetron:start"),
+  stop: () => ipcRenderer.send("papetron:stop"),
 });

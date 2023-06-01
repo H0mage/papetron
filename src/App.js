@@ -73,68 +73,96 @@ function App() {
     setDirectories(directoriesCopy);
   };
 
+  const startPapetron = (event) => {
+    console.log("start", event);
+    window.Papetron.start();
+  };
+
+  const stopPapetron = (event) => {
+    console.log("stop", event);
+    window.Papetron.stop();
+  };
+
   return (
     <div className="App">
       <header className="App-header">
         <div className="Title">Papetron</div>
-      </header>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="file"
-          name="directoryPicker"
-          directory=""
-          webkitdirectory=""
-          multiple=""
-          onChange={handleDirectoryChange}
-          style={{ color: "rgba(0, 0, 0, 0)" }}
-        />
-        <p>Selected Directories: </p>
+        <form onSubmit={handleSubmit}>
+          <input
+            type="file"
+            name="directoryPicker"
+            directory=""
+            webkitdirectory=""
+            multiple=""
+            onChange={handleDirectoryChange}
+            style={{ color: "rgba(0, 0, 0, 0)" }}
+          />
+          <p>Selected Directories: </p>
+          <div>
+            {directories
+              ? directories.map((directory, index) => (
+                  <li key={index} name={index} className="directoryItem">
+                    {directory}{" "}
+                    <span onClick={() => removeDirectoryHandler(index)}>X</span>
+                  </li>
+                ))
+              : ""}
+          </div>
+          <label>
+            Time Interval:
+            <select
+              name="timeInterval"
+              defaultValue="30000"
+              onChange={handleSelect}
+              value={timeInterval}
+            >
+              <option value="30000">30 Seconds</option>
+              <option value="60000">1 Minute</option>
+              <option value="300000">5 minutes</option>
+              <option value="600000">10 minutes</option>
+            </select>
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              name="isCollage"
+              onChange={handleCheck}
+              checked={isCollage}
+            />
+            Collage Images?
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              name="syncDisplays"
+              onChange={handleCheck}
+              checked={syncDisplays}
+            />
+            Sync Displays?
+          </label>
+          <button type="submit" value="Submit">
+            Save Settings
+          </button>
+        </form>
         <div>
-          {directories
-            ? directories.map((directory, index) => (
-                <li key={index} name={index} className="directoryItem">
-                  {directory}{" "}
-                  <span onClick={() => removeDirectoryHandler(index)}>X</span>
-                </li>
-              ))
-            : ""}
-        </div>
-        <label>
-          Time Interval:
-          <select
-            name="timeInterval"
-            defaultValue="30000"
-            onChange={handleSelect}
-            value={timeInterval}
+          <button
+            type="start"
+            value="start"
+            name="start-button"
+            onClick={startPapetron}
           >
-            <option value="30000">30 Seconds</option>
-            <option value="60000">1 Minute</option>
-            <option value="300000">5 minutes</option>
-            <option value="600000">10 minutes</option>
-          </select>
-        </label>
-        <label>
-          <input
-            type="checkbox"
-            name="isCollage"
-            onChange={handleCheck}
-            checked={isCollage}
-          />
-          Collage Images?
-        </label>
-        <label>
-          <input
-            type="checkbox"
-            name="syncDisplays"
-            onChange={handleCheck}
-            checked={syncDisplays}
-          />
-          Sync Displays?
-        </label>
-        <button type="submit" value="Submit">
-          Save Settings
-        </button>
-      </form>
+            Start
+          </button>
+          <button
+            type="stop"
+            value="stop"
+            name="stop-button"
+            onClick={stopPapetron}
+          >
+            Stop
+          </button>
+        </div>
+      </header>
     </div>
   );
 }
