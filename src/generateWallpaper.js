@@ -1,6 +1,32 @@
 const path = require("path");
 const sharp = require("sharp");
 
+async function getSizes(pathArray) {
+  let sizeArray = [];
+  for (let i = 0; i < pathArray.length; i++) {
+    const image = await sharp(pathArray[i]);
+    const metadata = await image.metadata();
+    const { width, height } = metadata;
+    const difference = Math.max(width, height) - Math.min(width, height);
+    let orientation;
+    if (difference < 100) {
+      orientation = "square";
+    } else if (height > width && difference > 100) {
+      orientation = "vertical";
+    } else {
+      orientation = "horizontal";
+    }
+    sizeArray.push({
+      width,
+      height,
+      orientation,
+      ratio: width / height,
+      difference,
+    });
+  }
+  return sizeArray;
+}
+
 async function generateWallpaper(display, imagePaths) {
   const collageNumber = imagePaths.length;
   const outputPath = path.join(__dirname, "../temp/tempWallpaper.png");
@@ -8,6 +34,9 @@ async function generateWallpaper(display, imagePaths) {
   if (collageNumber === 2) {
     const img_1_width = Math.floor((display.width / 100) * 60);
     const img_2_width = display.width - img_1_width;
+    const sizeArray = await getSizes(imagePaths);
+    console.log(sizeArray);
+
     try {
       const image1 = await sharp(imagePaths[0])
         .resize({
@@ -43,6 +72,9 @@ async function generateWallpaper(display, imagePaths) {
     const section_2_width = display.width - section_1_width;
     const img_2_height = Math.floor((display.height / 100) * 55);
     const img_3_height = display.height - img_2_height;
+
+    const sizeArray = await getSizes(imagePaths);
+    console.log(sizeArray);
 
     try {
       const image1 = await sharp(imagePaths[0])
@@ -88,6 +120,9 @@ async function generateWallpaper(display, imagePaths) {
     const img_1_width = Math.floor((section_1_width / 100) * 50);
     const img_2_width = section_1_width - img_1_width;
     const img_3_height = display.height - img_1_height;
+
+    const sizeArray = await getSizes(imagePaths);
+    console.log(sizeArray);
 
     try {
       const image1 = await sharp(imagePaths[0])
@@ -141,6 +176,9 @@ async function generateWallpaper(display, imagePaths) {
     const img_3_height = display.height - section_3_height;
     const img_4_height = Math.floor((display.height / 100) * 54);
     const img_5_height = display.height - img_4_height;
+
+    const sizeArray = await getSizes(imagePaths);
+    console.log(sizeArray);
 
     try {
       const image1 = await sharp(imagePaths[0])
@@ -204,6 +242,9 @@ async function generateWallpaper(display, imagePaths) {
     const img_4_height = display.height - section_4_height;
     const img_5_width = Math.floor((section_2_width / 100) * 56);
     const img_6_width = section_2_width - img_5_width;
+
+    const sizeArray = await getSizes(imagePaths);
+    console.log(sizeArray);
 
     try {
       const image1 = await sharp(imagePaths[0])
