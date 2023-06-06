@@ -9,6 +9,7 @@ function App() {
   const [timeInterval, setTimeInterval] = useState("");
   const [isCollage, setIsCollage] = useState(false);
   const [syncDisplays, setSyncDisplays] = useState(false);
+  const [processStart, setProcessStart] = useState(false);
 
   useEffect(() => {
     console.log(window.Settings);
@@ -19,13 +20,6 @@ function App() {
       setSyncDisplays(window.Settings.syncDisplays);
     }
   }, []);
-
-  useEffect(() => {
-    console.log(window.Settings.directories);
-    console.log(window.Settings.timeInterval);
-    console.log(window.Settings.isCollage);
-    console.log(window.Settings.syncDisplays);
-  });
 
   const handleDirectoryChange = (event) => {
     const directory = event.target.files[0].path.split("\\");
@@ -75,11 +69,15 @@ function App() {
 
   const startPapetron = (event) => {
     console.log("start", event);
+    event.preventDefault();
+    setProcessStart(true);
     window.Papetron.start();
   };
 
   const stopPapetron = (event) => {
     console.log("stop", event);
+    event.preventDefault();
+    setProcessStart(false);
     window.Papetron.stop();
   };
 
@@ -150,8 +148,9 @@ function App() {
             value="start"
             name="start-button"
             onClick={startPapetron}
+            disabled={processStart}
           >
-            Start
+            {processStart ? "Running" : "Start"}
           </button>
           <button
             type="stop"

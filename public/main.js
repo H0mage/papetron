@@ -4,6 +4,57 @@ const fs = require("fs");
 const { getUserSettings, setUserSettings } = require("../src/settings");
 const { generateWallpaper } = require("../src/generateWallpaper");
 
+let intervalId;
+
+function chooseRandom(min, max) {
+  return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
+async function changeWallpaper() {
+  const settings = getUserSettings();
+  const { directories, isCollage, syncDisplays } = settings;
+  const displays = screen.getAllDisplays();
+  fs.readdir(directories[0], async (err, files) => {
+    let collageNumber = 1;
+
+    if (isCollage) {
+      collageNumber = chooseRandom(1, 6);
+    }
+    if (syncDisplays) {
+      console.log(displays.length);
+    }
+
+    let collageImages = [];
+    while (collageImages.length !== collageNumber) {
+      const chosenImage = chooseRandom(0, files.length);
+      const splitPath = directories[0].split("\\");
+      splitPath.push(files[chosenImage]);
+      const imagePath = splitPath.join("\\");
+      collageImages.push(imagePath);
+    }
+
+    const display = screen.getAllDisplays()[0].size;
+    let finalImage;
+    if (collageNumber === 1) {
+      finalImage = collageImages[0];
+    } else {
+      finalImage = await generateWallpaper(display, collageImages);
+    }
+    console.log(finalImage);
+
+    import("wallpaper").then((wallpaper) => {
+      wallpaper
+        .setWallpaper(finalImage)
+        .then(() => {
+          console.log("Success");
+        })
+        .catch((err) => {
+          console.log("Error:", err);
+        });
+    });
+  });
+}
+
 function createWindow() {
   // Create the browser window.
   const win = new BrowserWindow({
@@ -62,55 +113,14 @@ ipcMain.on("settings:saved", function (event, message) {
   console.log(getUserSettings());
 });
 
-function chooseRandom(min, max) {
-  return Math.floor(Math.random() * (max - min + 1) + min);
-}
-
 ipcMain.on("papetron:start", function (event) {
   const settings = getUserSettings();
-  const { directories, timeInterval, isCollage, syncDisplays } = settings;
-  const displays = screen.getAllDisplays();
-  fs.readdir(directories[0], async (err, files) => {
-    let collageNumber = 1;
-
-    if (isCollage) {
-      collageNumber = chooseRandom(1, 6);
-    }
-    if (syncDisplays) {
-      console.log(displays.length);
-    }
-
-    let collageImages = [];
-    while (collageImages.length !== collageNumber) {
-      const chosenImage = chooseRandom(0, files.length);
-      const splitPath = directories[0].split("\\");
-      splitPath.push(files[chosenImage]);
-      const imagePath = splitPath.join("\\");
-      collageImages.push(imagePath);
-    }
-
-    const display = screen.getAllDisplays()[0].size;
-    let finalImage;
-    if (collageNumber === 1) {
-      finalImage = collageImages[0];
-    } else {
-      finalImage = await generateWallpaper(display, collageImages);
-    }
-    console.log(finalImage);
-
-    import("wallpaper").then((wallpaper) => {
-      wallpaper
-        .setWallpaper(finalImage)
-        .then(() => {
-          console.log("Success");
-        })
-        .catch((err) => {
-          console.log("Error:", err);
-        });
-    });
-  });
+  const { timeInterval } = settings;
+  changeWallpaper();
+  intervalId = setInterval(changeWallpaper, timeInterval);
 });
 
 ipcMain.on("papetron:stop", function (event) {
   console.log("stoppo");
+  clearInterval(intervalId);
 });

@@ -3,7 +3,7 @@ const sharp = require("sharp");
 
 async function generateWallpaper(display, imagePaths) {
   const collageNumber = imagePaths.length;
-  const outputPath = path.join(__dirname, "../public/temp/tempWallpaper.png");
+  const outputPath = path.join(__dirname, "../temp/tempWallpaper.png");
 
   if (collageNumber === 2) {
     const img_1_width = Math.floor((display.width / 100) * 60);
