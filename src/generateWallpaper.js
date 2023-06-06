@@ -1,30 +1,39 @@
 const path = require("path");
 const sharp = require("sharp");
 
+function compare(a, b) {
+  if (a.ratio < b.ratio) {
+    return -1;
+  }
+  if (a.ratio > b.ratio) {
+    return 1;
+  }
+  return 0;
+}
+
+async function getSize(imagePath) {
+  const image = await sharp(imagePath);
+  const metadata = await image.metadata();
+  const { width, height } = metadata;
+  const ratio = width / height;
+  let orientation;
+  if (ratio > 0.8 && ratio < 1.3) {
+    orientation = "square";
+  } else if (ratio < 0.8) {
+    orientation = "vertical";
+  } else {
+    orientation = "horizontal";
+  }
+  return { width, height, orientation, ratio, path: imagePath };
+}
+
 async function getSizes(pathArray) {
   let sizeArray = [];
   for (let i = 0; i < pathArray.length; i++) {
-    const image = await sharp(pathArray[i]);
-    const metadata = await image.metadata();
-    const { width, height } = metadata;
-    const difference = Math.max(width, height) - Math.min(width, height);
-    let orientation;
-    if (difference < 100) {
-      orientation = "square";
-    } else if (height > width && difference > 100) {
-      orientation = "vertical";
-    } else {
-      orientation = "horizontal";
-    }
-    sizeArray.push({
-      width,
-      height,
-      orientation,
-      ratio: width / height,
-      difference,
-    });
+    const metadata = await getSize(pathArray[i]);
+    sizeArray.push(metadata);
   }
-  return sizeArray;
+  return sizeArray.sort(compare);
 }
 
 async function generateWallpaper(display, imagePaths) {
@@ -38,13 +47,13 @@ async function generateWallpaper(display, imagePaths) {
     console.log(sizeArray);
 
     try {
-      const image1 = await sharp(imagePaths[0])
+      const image1 = await sharp(sizeArray[1].path)
         .resize({
           width: img_1_width,
           height: display.height,
         })
         .toBuffer();
-      const image2 = await sharp(imagePaths[1])
+      const image2 = await sharp(sizeArray[0].path)
         .resize({
           width: img_2_width,
           height: display.height,
@@ -77,19 +86,19 @@ async function generateWallpaper(display, imagePaths) {
     console.log(sizeArray);
 
     try {
-      const image1 = await sharp(imagePaths[0])
+      const image1 = await sharp(sizeArray[0].path)
         .resize({
           width: section_1_width,
           height: display.height,
         })
         .toBuffer();
-      const image2 = await sharp(imagePaths[1])
+      const image2 = await sharp(sizeArray[1].path)
         .resize({
           width: section_2_width,
           height: img_2_height,
         })
         .toBuffer();
-      const image3 = await sharp(imagePaths[2])
+      const image3 = await sharp(sizeArray[2].path)
         .resize({
           width: section_2_width,
           height: img_3_height,
@@ -125,25 +134,25 @@ async function generateWallpaper(display, imagePaths) {
     console.log(sizeArray);
 
     try {
-      const image1 = await sharp(imagePaths[0])
+      const image1 = await sharp(sizeArray[1].path)
         .resize({
           width: img_1_width,
           height: img_1_height,
         })
         .toBuffer();
-      const image2 = await sharp(imagePaths[1])
+      const image2 = await sharp(sizeArray[2].path)
         .resize({
           width: img_2_width,
           height: img_1_height,
         })
         .toBuffer();
-      const image3 = await sharp(imagePaths[2])
+      const image3 = await sharp(sizeArray[3].path)
         .resize({
           width: section_1_width,
           height: img_3_height,
         })
         .toBuffer();
-      const image4 = await sharp(imagePaths[3])
+      const image4 = await sharp(sizeArray[0].path)
         .resize({
           width: section_2_width,
           height: display.height,
@@ -181,31 +190,31 @@ async function generateWallpaper(display, imagePaths) {
     console.log(sizeArray);
 
     try {
-      const image1 = await sharp(imagePaths[0])
+      const image1 = await sharp(sizeArray[0].path)
         .resize({
           width: section_3_width,
           height: section_3_height,
         })
         .toBuffer();
-      const image2 = await sharp(imagePaths[1])
+      const image2 = await sharp(sizeArray[1].path)
         .resize({
           width: section_3_width,
           height: section_3_height,
         })
         .toBuffer();
-      const image3 = await sharp(imagePaths[2])
+      const image3 = await sharp(sizeArray[4].path)
         .resize({
           width: section_1_width,
           height: img_3_height,
         })
         .toBuffer();
-      const image4 = await sharp(imagePaths[3])
+      const image4 = await sharp(sizeArray[2].path)
         .resize({
           width: section_2_width,
           height: img_4_height,
         })
         .toBuffer();
-      const image5 = await sharp(imagePaths[4])
+      const image5 = await sharp(sizeArray[3].path)
         .resize({
           width: section_2_width,
           height: img_5_height,
@@ -247,37 +256,37 @@ async function generateWallpaper(display, imagePaths) {
     console.log(sizeArray);
 
     try {
-      const image1 = await sharp(imagePaths[0])
+      const image1 = await sharp(sizeArray[0].path)
         .resize({
           width: img_1_width,
           height: section_3_height,
         })
         .toBuffer();
-      const image2 = await sharp(imagePaths[1])
+      const image2 = await sharp(sizeArray[3].path)
         .resize({
           width: img_2_width,
           height: section_3_height,
         })
         .toBuffer();
-      const image3 = await sharp(imagePaths[2])
+      const image3 = await sharp(sizeArray[5].path)
         .resize({
           width: section_1_width,
           height: img_3_height,
         })
         .toBuffer();
-      const image4 = await sharp(imagePaths[3])
+      const image4 = await sharp(sizeArray[4].path)
         .resize({
           width: section_2_width,
           height: img_4_height,
         })
         .toBuffer();
-      const image5 = await sharp(imagePaths[4])
+      const image5 = await sharp(sizeArray[2].path)
         .resize({
           width: img_5_width,
           height: section_4_height,
         })
         .toBuffer();
-      const image6 = await sharp(imagePaths[5])
+      const image6 = await sharp(sizeArray[1].path)
         .resize({
           width: img_6_width,
           height: section_4_height,
@@ -312,4 +321,4 @@ async function generateWallpaper(display, imagePaths) {
   return outputPath;
 }
 
-module.exports = { generateWallpaper };
+module.exports = { generateWallpaper, getSize };

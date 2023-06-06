@@ -114,6 +114,8 @@ function App() {
               onChange={handleSelect}
               value={timeInterval}
             >
+              <option value="5000">5 Seconds</option>
+              <option value="10000">10 Seconds</option>
               <option value="30000">30 Seconds</option>
               <option value="60000">1 Minute</option>
               <option value="300000">5 minutes</option>

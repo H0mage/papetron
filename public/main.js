@@ -3,12 +3,13 @@ const path = require("path");
 const fs = require("fs");
 const { promisify } = require("util");
 const { getUserSettings, setUserSettings } = require("../src/settings");
-const { generateWallpaper } = require("../src/generateWallpaper");
+const { generateWallpaper, getSize } = require("../src/generateWallpaper");
 
 const readdir = promisify(fs.readdir);
 
 let intervalId;
 let displayCount = 0;
+let instanceFileList;
 
 function chooseRandom(min, max) {
   return Math.floor(Math.random() * (parseInt(max) - min + 1) + min);
@@ -25,22 +26,28 @@ async function changeWallpaper() {
   const settings = getUserSettings();
   const { directories, isCollage, syncDisplays } = settings;
   const displays = screen.getAllDisplays();
+
   let fileList = [];
-  for (let i = 0; i < directories.length; i++) {
-    let res = await readdir(directories[i]);
-    const fileExtensions = ["png", "jpg", "jpeg"];
-    let filtered = res.filter((file) => {
-      if (fileExtensions.includes(file.split(".").pop())) {
-        return file;
-      }
-      return "";
-    });
-    filtered = filtered.map((element) => {
-      return `${directories[i]}\\${element}`;
-    });
-    fileList = [...fileList, ...filtered];
+  if (instanceFileList.length !== 0) {
+    fileList = [...instanceFileList];
+  } else {
+    for (let i = 0; i < directories.length; i++) {
+      let res = await readdir(directories[i]);
+      const fileExtensions = ["png", "jpg", "jpeg"];
+      let filtered = res.filter((file) => {
+        if (fileExtensions.includes(file.split(".").pop())) {
+          return file;
+        }
+        return "";
+      });
+      filtered = filtered.map((element) => {
+        return `${directories[i]}\\${element}`;
+      });
+      fileList = [...fileList, ...filtered];
+    }
+    shuffleArray(fileList);
+    instanceFileList = [...fileList];
   }
-  shuffleArray(fileList);
 
   let collageNumber = 1;
   if (isCollage) {
@@ -56,17 +63,23 @@ async function changeWallpaper() {
     collageImages.push(chosenImage);
   }
 
-  const display = screen.getAllDisplays()[displayCount].size;
+  const display = displays[displayCount].size;
   let finalImage;
   if (collageNumber === 1) {
     finalImage = collageImages[0];
+    let metadata = await getSize(collageImages[0]);
+    console.log(metadata.orientation === "horizontal");
+    while (metadata.orientation !== "horizontal" || metadata.width < 1500) {
+      metadata = await getSize(fileList[chooseRandom(0, fileList.length)]);
+    }
+    finalImage = metadata.path;
   } else {
     finalImage = await generateWallpaper(display, collageImages);
   }
 
   import("wallpaper").then((wallpaper) => {
     wallpaper
-      .setWallpaper(finalImage, { screen: displayCount })
+      .setWallpaper(finalImage, { screen: 1 })
       .then(() => {
         console.log("Success");
       })
@@ -74,6 +87,7 @@ async function changeWallpaper() {
         console.log("Error:", err);
       });
   });
+  console.log(displayCount);
   if (displayCount === displays.length - 1) {
     displayCount = 0;
   } else {
@@ -132,6 +146,7 @@ app.on("activate", () => {
 // code. You can also put them in separate files and require them here.
 ipcMain.on("save:settings", function (event, formData) {
   console.log("newData from submit", formData);
+  instanceFileList = [];
   setUserSettings(formData);
 });
 
@@ -140,6 +155,7 @@ ipcMain.on("settings:saved", function (event, message) {
 });
 
 ipcMain.on("papetron:start", function (event) {
+  instanceFileList = [];
   const settings = getUserSettings();
   const { timeInterval } = settings;
   changeWallpaper();
