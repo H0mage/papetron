@@ -1,57 +1,77 @@
 const { app, BrowserWindow, ipcMain, screen } = require("electron");
 const path = require("path");
 const fs = require("fs");
+const { promisify } = require("util");
 const { getUserSettings, setUserSettings } = require("../src/settings");
 const { generateWallpaper } = require("../src/generateWallpaper");
+
+const readdir = promisify(fs.readdir);
 
 let intervalId;
 
 function chooseRandom(min, max) {
-  return Math.floor(Math.random() * (max - min + 1) + min);
+  return Math.floor(Math.random() * (parseInt(max) - min + 1) + min);
+}
+
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
 }
 
 async function changeWallpaper() {
   const settings = getUserSettings();
   const { directories, isCollage, syncDisplays } = settings;
   const displays = screen.getAllDisplays();
-  fs.readdir(directories[0], async (err, files) => {
-    let collageNumber = 1;
-
-    if (isCollage) {
-      collageNumber = chooseRandom(1, 6);
-    }
-    if (syncDisplays) {
-      console.log(displays.length);
-    }
-
-    let collageImages = [];
-    while (collageImages.length !== collageNumber) {
-      const chosenImage = chooseRandom(0, files.length);
-      const splitPath = directories[0].split("\\");
-      splitPath.push(files[chosenImage]);
-      const imagePath = splitPath.join("\\");
-      collageImages.push(imagePath);
-    }
-
-    const display = screen.getAllDisplays()[0].size;
-    let finalImage;
-    if (collageNumber === 1) {
-      finalImage = collageImages[0];
-    } else {
-      finalImage = await generateWallpaper(display, collageImages);
-    }
-    console.log(finalImage);
-
-    import("wallpaper").then((wallpaper) => {
-      wallpaper
-        .setWallpaper(finalImage)
-        .then(() => {
-          console.log("Success");
-        })
-        .catch((err) => {
-          console.log("Error:", err);
-        });
+  let fileList = [];
+  for (let i = 0; i < directories.length; i++) {
+    let res = await readdir(directories[i]);
+    const fileExtensions = ["png", "jpg", "jpeg"];
+    let filtered = res.filter((file) => {
+      if (fileExtensions.includes(file.split(".").pop())) {
+        return file;
+      }
+      return "";
     });
+    filtered = filtered.map((element) => {
+      return `${directories[i]}\\${element}`;
+    });
+    fileList = [...fileList, ...filtered];
+  }
+  shuffleArray(fileList);
+
+  let collageNumber = 1;
+  if (isCollage) {
+    collageNumber = chooseRandom(1, 6);
+  }
+  if (syncDisplays) {
+    console.log(displays.length);
+  }
+
+  let collageImages = [];
+  while (collageImages.length !== collageNumber) {
+    const chosenImage = fileList[chooseRandom(0, fileList.length)];
+    collageImages.push(chosenImage);
+  }
+
+  const display = screen.getAllDisplays()[0].size;
+  let finalImage;
+  if (collageNumber === 1) {
+    finalImage = collageImages[0];
+  } else {
+    finalImage = await generateWallpaper(display, collageImages);
+  }
+
+  import("wallpaper").then((wallpaper) => {
+    wallpaper
+      .setWallpaper(finalImage)
+      .then(() => {
+        console.log("Success");
+      })
+      .catch((err) => {
+        console.log("Error:", err);
+      });
   });
 }
 
