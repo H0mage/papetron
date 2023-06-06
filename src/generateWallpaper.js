@@ -1,6 +1,30 @@
 const path = require("path");
 const sharp = require("sharp");
 
+const positions = [
+  "centre",
+  "top",
+  "right top",
+  "right",
+  "right bottom",
+  "bottom",
+  "left bottom",
+  "left",
+  "left top",
+];
+const gravities = [
+  "north",
+  "northeast",
+  "east",
+  "southeast",
+  "south",
+  "southwest",
+  "west",
+  "northwest",
+  "center",
+];
+const strategies = ["entropy", "attention"];
+
 function compare(a, b) {
   if (a.ratio < b.ratio) {
     return -1;
@@ -9,6 +33,10 @@ function compare(a, b) {
     return 1;
   }
   return 0;
+}
+
+function chooseRandom(min, max) {
+  return Math.floor(Math.random() * (parseInt(max) - min + 1) + min);
 }
 
 async function getSize(imagePath) {
@@ -24,7 +52,19 @@ async function getSize(imagePath) {
   } else {
     orientation = "horizontal";
   }
-  return { width, height, orientation, ratio, path: imagePath };
+  const position = chooseRandom(0, positions.length - 1);
+  const gravity = chooseRandom(0, gravities.length - 1);
+  const strategy = chooseRandom(0, strategies.length - 1);
+  return {
+    width,
+    height,
+    orientation,
+    ratio,
+    path: imagePath,
+    position,
+    gravity,
+    strategy,
+  };
 }
 
 async function getSizes(pathArray) {
@@ -50,12 +90,18 @@ async function generateWallpaper(display, imagePaths) {
         .resize({
           width: img_1_width,
           height: display.height,
+          // position: sizeArray[3].position,
+          // // gravity: sizeArray[3].gravity,
+          strategy: sizeArray[3].strategy,
         })
         .toBuffer();
       const image2 = await sharp(sizeArray[0].path)
         .resize({
           width: img_2_width,
           height: display.height,
+          // position: sizeArray[0].position,
+          // // gravity: sizeArray[0].gravity,
+          strategy: sizeArray[0].strategy,
         })
         .toBuffer();
 
@@ -88,18 +134,27 @@ async function generateWallpaper(display, imagePaths) {
         .resize({
           width: section_1_width,
           height: display.height,
+          // position: sizeArray[3].position,
+          // // gravity: sizeArray[3].gravity,
+          strategy: sizeArray[3].strategy,
         })
         .toBuffer();
       const image2 = await sharp(sizeArray[4].path)
         .resize({
           width: section_2_width,
           height: img_2_height,
+          // position: sizeArray[4].position,
+          // // gravity: sizeArray[4].gravity,
+          strategy: sizeArray[4].strategy,
         })
         .toBuffer();
       const image3 = await sharp(sizeArray[5].path)
         .resize({
           width: section_2_width,
           height: img_3_height,
+          // position: sizeArray[5].position,
+          // // gravity: sizeArray[5].gravity,
+          strategy: sizeArray[5].strategy,
         })
         .toBuffer();
 
@@ -135,24 +190,36 @@ async function generateWallpaper(display, imagePaths) {
         .resize({
           width: img_1_width,
           height: img_1_height,
+          // position: sizeArray[4].position,
+          // gravity: sizeArray[4].gravity,
+          strategy: sizeArray[4].strategy,
         })
         .toBuffer();
       const image2 = await sharp(sizeArray[5].path)
         .resize({
           width: img_2_width,
           height: img_1_height,
+          // position: sizeArray[5].position,
+          // gravity: sizeArray[5].gravity,
+          strategy: sizeArray[5].strategy,
         })
         .toBuffer();
       const image3 = await sharp(sizeArray[7].path)
         .resize({
           width: section_1_width,
           height: img_3_height,
+          // position: sizeArray[7].position,
+          // // gravity: sizeArray[7].gravity,
+          strategy: sizeArray[7].strategy,
         })
         .toBuffer();
       const image4 = await sharp(sizeArray[0].path)
         .resize({
           width: section_2_width,
           height: display.height,
+          // position: sizeArray[0].position,
+          // // gravity: sizeArray[0].gravity,
+          strategy: sizeArray[0].strategy,
         })
         .toBuffer();
 
@@ -190,30 +257,45 @@ async function generateWallpaper(display, imagePaths) {
         .resize({
           width: section_3_width,
           height: section_3_height,
+          // position: sizeArray[4].position,
+          // // gravity: sizeArray[4].gravity,
+          strategy: sizeArray[4].strategy,
         })
         .toBuffer();
       const image2 = await sharp(sizeArray[5].path)
         .resize({
           width: section_3_width,
           height: section_3_height,
+          // position: sizeArray[5].position,
+          // // gravity: sizeArray[5].gravity,
+          strategy: sizeArray[5].strategy,
         })
         .toBuffer();
       const image3 = await sharp(sizeArray[9].path)
         .resize({
           width: section_1_width,
           height: img_3_height,
+          // position: sizeArray[9].position,
+          // // gravity: sizeArray[9].gravity,
+          strategy: sizeArray[9].strategy,
         })
         .toBuffer();
       const image4 = await sharp(sizeArray[6].path)
         .resize({
           width: section_2_width,
           height: img_4_height,
+          // position: sizeArray[6].position,
+          // // gravity: sizeArray[6].gravity,
+          strategy: sizeArray[6].strategy,
         })
         .toBuffer();
       const image5 = await sharp(sizeArray[8].path)
         .resize({
           width: section_2_width,
           height: img_5_height,
+          // position: sizeArray[8].position,
+          // // gravity: sizeArray[8].gravity,
+          strategy: sizeArray[8].strategy,
         })
         .toBuffer();
 
@@ -255,36 +337,54 @@ async function generateWallpaper(display, imagePaths) {
         .resize({
           width: img_1_width,
           height: section_3_height,
+          // position: sizeArray[0].position,
+          // // gravity: sizeArray[0].gravity,
+          strategy: sizeArray[0].strategy,
         })
         .toBuffer();
       const image2 = await sharp(sizeArray[7].path)
         .resize({
           width: img_2_width,
           height: section_3_height,
+          // position: sizeArray[7].position,
+          // // gravity: sizeArray[7].gravity,
+          strategy: sizeArray[7].strategy,
         })
         .toBuffer();
       const image3 = await sharp(sizeArray[11].path)
         .resize({
           width: section_1_width,
           height: img_3_height,
+          // position: sizeArray[11].position,
+          // // gravity: sizeArray[11].gravity,
+          strategy: sizeArray[11].strategy,
         })
         .toBuffer();
       const image4 = await sharp(sizeArray[9].path)
         .resize({
           width: section_2_width,
           height: img_4_height,
+          // position: sizeArray[9].position,
+          // // gravity: sizeArray[9].gravity,
+          strategy: sizeArray[9].strategy,
         })
         .toBuffer();
       const image5 = await sharp(sizeArray[2].path)
         .resize({
           width: img_5_width,
           height: section_4_height,
+          // position: sizeArray[2].position,
+          // // gravity: sizeArray[2].gravity,
+          strategy: sizeArray[2].strategy,
         })
         .toBuffer();
       const image6 = await sharp(sizeArray[1].path)
         .resize({
           width: img_6_width,
           height: section_4_height,
+          // position: sizeArray[].position,
+          // // gravity: sizeArray[1].gravity,
+          strategy: sizeArray[1].strategy,
         })
         .toBuffer();
 
