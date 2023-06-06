@@ -52,11 +52,51 @@ async function compositeImages(display, imagePaths) {
     } catch (error) {
       console.log(error);
     }
+  } else if (collageNumber === 3) {
+    const section_1_width = Math.floor((display.width / 10) * 6);
+    const section_2_width = display.width - section_1_width;
+    const img_2_height = Math.floor((display.height / 100) * 55);
+    const img_3_height = display.height - img_2_height;
+    console.log(section_1_width, section_2_width, display.width);
+
+    try {
+      const image1 = await sharp(imagePaths[0])
+        .resize({
+          width: section_1_width,
+          height: display.height,
+        })
+        .toBuffer();
+      const image2 = await sharp(imagePaths[1])
+        .resize({
+          width: section_2_width,
+          height: img_2_height,
+        })
+        .toBuffer();
+      const image3 = await sharp(imagePaths[2])
+        .resize({
+          width: section_2_width,
+          height: img_3_height,
+        })
+        .toBuffer();
+
+      await sharp({
+        create: {
+          width: display.width,
+          height: display.height,
+          channels: 3,
+          background: "#000000",
+        },
+      })
+        .composite([
+          { input: image1, top: 0, left: 0 },
+          { input: image2, top: 0, left: section_1_width },
+          { input: image3, top: img_2_height, left: section_1_width },
+        ])
+        .toFile("test.png");
+    } catch (error) {
+      console.log(error);
+    }
   }
-  // } else if (collageNumber === 3) {
-  //   const section_1_width = Math.floor((display.width / 10) * 6);
-  //   const section_2_width = display.width - section_1_width;
-  // }
 }
 
 function createWindow() {
@@ -129,7 +169,7 @@ ipcMain.on("papetron:start", function (event) {
   console.log(displays);
   console.log(directories);
   fs.readdir(directories[0], async (err, files) => {
-    let collageNumber = 2; //CHANGE THIS TO 1 AFTER DONE
+    let collageNumber = 3; //CHANGE THIS TO 1 AFTER DONE
 
     if (isCollage) {
       collageNumber = chooseRandom(1, 6);
