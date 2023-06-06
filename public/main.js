@@ -8,6 +8,7 @@ const { generateWallpaper } = require("../src/generateWallpaper");
 const readdir = promisify(fs.readdir);
 
 let intervalId;
+let displayCount = 0;
 
 function chooseRandom(min, max) {
   return Math.floor(Math.random() * (parseInt(max) - min + 1) + min);
@@ -55,7 +56,7 @@ async function changeWallpaper() {
     collageImages.push(chosenImage);
   }
 
-  const display = screen.getAllDisplays()[0].size;
+  const display = screen.getAllDisplays()[displayCount].size;
   let finalImage;
   if (collageNumber === 1) {
     finalImage = collageImages[0];
@@ -65,7 +66,7 @@ async function changeWallpaper() {
 
   import("wallpaper").then((wallpaper) => {
     wallpaper
-      .setWallpaper(finalImage)
+      .setWallpaper(finalImage, { screen: displayCount })
       .then(() => {
         console.log("Success");
       })
@@ -73,6 +74,11 @@ async function changeWallpaper() {
         console.log("Error:", err);
       });
   });
+  if (displayCount === displays.length - 1) {
+    displayCount = 0;
+  } else {
+    displayCount++;
+  }
 }
 
 function createWindow() {
