@@ -7,6 +7,16 @@ const { generateWallpaper, getSize } = require("../src/generateWallpaper");
 
 const readdir = promisify(fs.readdir);
 
+function compare(a, b) {
+  if (a.width < b.width) {
+    return -1;
+  }
+  if (a.width > b.width) {
+    return 1;
+  }
+  return 0;
+}
+
 let intervalId;
 let displayCount = 0;
 let instanceFileList;
@@ -25,7 +35,7 @@ function shuffleArray(array) {
 async function changeWallpaper() {
   const settings = getUserSettings();
   const { directories, isCollage, syncDisplays } = settings;
-  const displays = screen.getAllDisplays();
+  const displays = screen.getAllDisplays().map((e) => e.size);
 
   let fileList = [];
   if (instanceFileList.length !== 0) {
@@ -52,9 +62,12 @@ async function changeWallpaper() {
   let collageNumber = 1;
   if (isCollage) {
     collageNumber = chooseRandom(1, 6);
+    if (collageNumber !== 1) {
+      collageNumber = collageNumber * 2;
+    }
   }
   if (syncDisplays) {
-    console.log(displays.length);
+    console.log("Number of displays", displays.length);
   }
 
   let collageImages = [];
@@ -63,12 +76,13 @@ async function changeWallpaper() {
     collageImages.push(chosenImage);
   }
 
-  const display = displays[displayCount].size;
+  const sortedDisplays = displays.sort(compare);
+  const display = sortedDisplays[0];
+  // const display = displays[displayCount].size;
   let finalImage;
   if (collageNumber === 1) {
     finalImage = collageImages[0];
     let metadata = await getSize(collageImages[0]);
-    console.log(metadata.orientation === "horizontal");
     while (metadata.orientation !== "horizontal" || metadata.width < 1500) {
       metadata = await getSize(fileList[chooseRandom(0, fileList.length)]);
     }
@@ -87,7 +101,7 @@ async function changeWallpaper() {
         console.log("Error:", err);
       });
   });
-  console.log(displayCount);
+  console.log("Display # to target:", displayCount);
   if (displayCount === displays.length - 1) {
     displayCount = 0;
   } else {
@@ -108,7 +122,7 @@ function createWindow() {
   });
 
   const settings = getUserSettings();
-  console.log(settings);
+  console.log("User Settings:", settings);
 
   //load the index.html from a url
   win.loadURL("http://localhost:3000");
