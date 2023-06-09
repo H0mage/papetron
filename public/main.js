@@ -5,8 +5,6 @@ const { promisify } = require("util");
 const { getUserSettings, setUserSettings } = require("../src/settings");
 const { generateWallpaper, getSize } = require("../src/generateWallpaper");
 
-const readdir = promisify(fs.readdir);
-
 function compare(a, b) {
   if (a.width < b.width) {
     return -1;
@@ -16,10 +14,6 @@ function compare(a, b) {
   }
   return 0;
 }
-
-let intervalId;
-let displayCount = 0;
-let instanceFileList;
 
 function chooseRandom(min, max) {
   return Math.floor(Math.random() * (parseInt(max) - min + 1) + min);
@@ -32,15 +26,27 @@ function shuffleArray(array) {
   }
 }
 
+// promisified readdir in order to read all the directories in settings
+const readdir = promisify(fs.readdir);
+
+// For reseting the repeating callback once stop is pressed
+let intervalId;
+// For knowing how many displays there are in order to cycle which display changing wallpaper
+let displayCount = 0;
+// To keep a memory of the fileList of all the possible image paths to select, refreshes on settings change or start
+let instanceFileList;
+
+// Requests a generated collage wallpaper from another file and sets it as the wallpaper, reruns every timeInterval unless stopped
 async function changeWallpaper() {
   const settings = getUserSettings();
   const { directories, isCollage, syncDisplays } = settings;
   const displays = screen.getAllDisplays().map((e) => e.size);
-
   let fileList = [];
+
   if (instanceFileList.length !== 0) {
     fileList = [...instanceFileList];
   } else {
+    // Reads through the directories selected and brings a list of all the supported image files back
     for (let i = 0; i < directories.length; i++) {
       let res = await readdir(directories[i]);
       const fileExtensions = ["png", "jpg", "jpeg"];
@@ -55,10 +61,12 @@ async function changeWallpaper() {
       });
       fileList = [...fileList, ...filtered];
     }
+    // Shuffles the array for just a dash more RNG
     shuffleArray(fileList);
     instanceFileList = [...fileList];
   }
 
+  // If collageNumber is 1 a single image that's landscape will be placed as the desktop wallpaper otherwise it determines the image setup
   let collageNumber = 1;
   if (isCollage) {
     collageNumber = chooseRandom(1, 6);
@@ -66,20 +74,28 @@ async function changeWallpaper() {
       collageNumber = collageNumber * 2;
     }
   }
+
+  // TO DO: if display rotation works to make it so they all change at the same time
   if (syncDisplays) {
     console.log("Number of displays", displays.length);
   }
 
+  // Randomly select the images to be placed in the collage, at present doing twice the amount needed for more available picture sizes
   let collageImages = [];
   while (collageImages.length !== collageNumber) {
     const chosenImage = fileList[chooseRandom(0, fileList.length)];
     collageImages.push(chosenImage);
   }
 
+  // If we aren't doing rotation this is here in order to pick the largest resolution display size and use those for collage
   const sortedDisplays = displays.sort(compare);
   const display = sortedDisplays[0];
+
+  // TO DO: FOR IF WE GET THE DISPLAYS ROTATION WORKING
   // const display = displays[displayCount].size;
+
   let finalImage;
+  // If the image picked for a single wallpaper isn't landscape grab another unitl it is
   if (collageNumber === 1) {
     finalImage = collageImages[0];
     let metadata = await getSize(collageImages[0]);
@@ -91,9 +107,10 @@ async function changeWallpaper() {
     finalImage = await generateWallpaper(display, collageImages);
   }
 
+  // Sets the wallpaper
   import("wallpaper").then((wallpaper) => {
     wallpaper
-      .setWallpaper(finalImage, { screen: 1 })
+      .setWallpaper(finalImage, { screen: displayCount })
       .then(() => {
         console.log("Success");
       })
@@ -101,7 +118,8 @@ async function changeWallpaper() {
         console.log("Error:", err);
       });
   });
-  console.log("Display # to target:", displayCount);
+
+  // Increment or reset targetDisplay for rotations
   if (displayCount === displays.length - 1) {
     displayCount = 0;
   } else {
@@ -121,6 +139,7 @@ function createWindow() {
     },
   });
 
+  // DEV just to check on the settings while doing changes
   const settings = getUserSettings();
   console.log("User Settings:", settings);
 

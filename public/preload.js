@@ -3,11 +3,7 @@ const Store = require("electron-store");
 
 const store = new Store();
 
-const { getUserSettings } = require("../src/settings");
-
-const settings = getUserSettings();
-console.log("settings", settings);
-
+// To Persist settings
 contextBridge.exposeInMainWorld("Settings", {
   directories: () => store.get("directories"),
   timeInterval: () => store.get("timeInterval"),
@@ -17,6 +13,7 @@ contextBridge.exposeInMainWorld("Settings", {
   saveSettings: (formData) => ipcRenderer.send("save:settings", formData),
 });
 
+// Wallpaper actions
 contextBridge.exposeInMainWorld("Papetron", {
   start: () => ipcRenderer.send("papetron:start"),
   stop: () => ipcRenderer.send("papetron:stop"),
