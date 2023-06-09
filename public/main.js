@@ -155,6 +155,12 @@ function createWindow() {
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
   ipcMain.handle("settings", getUserSettings);
+
+  // Create the temp directory
+  fs.mkdir(path.join(__dirname, "../", "temp"), { recursive: true }, (err) => {
+    if (err) throw err;
+  });
+
   createWindow();
 });
 // Quit when all windows are closed, except on macOS. There, it's common

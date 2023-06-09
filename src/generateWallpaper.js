@@ -88,10 +88,6 @@ async function generateWallpaper(display, imagePaths) {
   // We are using double the images for sample size so here we get the actual number of images we need for the collage
   const collageNumber = imagePaths.length / 2;
 
-  // Create the temp folder if it doesn't exist
-  if (!fs.existsSync("../temp")) {
-    fs.mkdirSync("../temp");
-  }
   const outputPath = path.join(__dirname, "../temp/tempWallpaper.png");
 
   // Arranges the images based on aspect ratio. < 1 : Vertical || == 1 : Square || > 1 : Horizontal
