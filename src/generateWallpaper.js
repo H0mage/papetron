@@ -1,5 +1,4 @@
 const path = require("path");
-const fs = require("fs");
 const sharp = require("sharp");
 
 const positions = [
@@ -93,6 +92,8 @@ async function generateWallpaper(display, imagePaths) {
   // Arranges the images based on aspect ratio. < 1 : Vertical || == 1 : Square || > 1 : Horizontal
   const sizeArray = await getSizes(imagePaths);
 
+  const isMirrored = chooseRandom(0, 1) ? true : false;
+
   // Images are resized and set on a collage depending on where they would fit best
   if (collageNumber === 2) {
     const img_1_width = Math.floor((display.width / 100) * 60);
@@ -119,6 +120,18 @@ async function generateWallpaper(display, imagePaths) {
         })
         .toBuffer();
 
+      let payload = [
+        { input: image1, top: 0, left: 0 },
+        { input: image2, top: 0, left: img_1_width },
+      ];
+
+      if (isMirrored) {
+        payload = [
+          { input: image2, top: 0, left: 0 },
+          { input: image1, top: 0, left: img_2_width },
+        ];
+      }
+
       await sharp({
         create: {
           width: display.width,
@@ -127,10 +140,7 @@ async function generateWallpaper(display, imagePaths) {
           background: "#000000",
         },
       })
-        .composite([
-          { input: image1, top: 0, left: 0 },
-          { input: image2, top: 0, left: img_1_width },
-        ])
+        .composite(payload)
         .toFile(outputPath);
     } catch (error) {
       console.log(error);
@@ -172,6 +182,19 @@ async function generateWallpaper(display, imagePaths) {
         })
         .toBuffer();
 
+      let payload = [
+        { input: image1, top: 0, left: 0 },
+        { input: image2, top: 0, left: section_1_width },
+        { input: image3, top: img_2_height, left: section_1_width },
+      ];
+      if (isMirrored) {
+        payload = [
+          { input: image2, top: 0, left: 0 },
+          { input: image3, top: img_2_height, left: 0 },
+          { input: image1, top: 0, left: section_2_width },
+        ];
+      }
+
       await sharp({
         create: {
           width: display.width,
@@ -180,11 +203,7 @@ async function generateWallpaper(display, imagePaths) {
           background: "#000000",
         },
       })
-        .composite([
-          { input: image1, top: 0, left: 0 },
-          { input: image2, top: 0, left: section_1_width },
-          { input: image3, top: img_2_height, left: section_1_width },
-        ])
+        .composite(payload)
         .toFile(outputPath);
     } catch (error) {
       console.log(error);
@@ -238,6 +257,21 @@ async function generateWallpaper(display, imagePaths) {
         })
         .toBuffer();
 
+      let payload = [
+        { input: image1, top: 0, left: 0 },
+        { input: image2, top: 0, left: img_1_width },
+        { input: image3, top: img_1_height, left: 0 },
+        { input: image4, top: 0, left: section_1_width },
+      ];
+      if (isMirrored) {
+        payload = [
+          { input: image4, top: 0, left: 0 },
+          { input: image2, top: 0, left: section_2_width },
+          { input: image1, top: 0, left: section_2_width + img_2_width },
+          { input: image3, top: img_1_height, left: section_2_width },
+        ];
+      }
+
       await sharp({
         create: {
           width: display.width,
@@ -246,12 +280,7 @@ async function generateWallpaper(display, imagePaths) {
           background: "#000000",
         },
       })
-        .composite([
-          { input: image1, top: 0, left: 0 },
-          { input: image2, top: 0, left: img_1_width },
-          { input: image3, top: img_1_height, left: 0 },
-          { input: image4, top: 0, left: section_1_width },
-        ])
+        .composite(payload)
         .toFile(outputPath);
     } catch (error) {
       console.log(error);
@@ -316,6 +345,23 @@ async function generateWallpaper(display, imagePaths) {
         })
         .toBuffer();
 
+      let payload = [
+        { input: image1, top: 0, left: 0 },
+        { input: image2, top: 0, left: section_3_width },
+        { input: image3, top: section_3_height, left: 0 },
+        { input: image4, top: 0, left: section_1_width },
+        { input: image5, top: img_4_height, left: section_1_width },
+      ];
+      if (isMirrored) {
+        payload = [
+          { input: image4, top: 0, left: 0 },
+          { input: image5, top: img_4_height, left: 0 },
+          { input: image2, top: 0, left: section_2_width },
+          { input: image1, top: 0, left: section_2_width + section_3_width },
+          { input: image3, top: section_3_height, left: section_2_width },
+        ];
+      }
+
       await sharp({
         create: {
           width: display.width,
@@ -324,13 +370,7 @@ async function generateWallpaper(display, imagePaths) {
           background: "#000000",
         },
       })
-        .composite([
-          { input: image1, top: 0, left: 0 },
-          { input: image2, top: 0, left: section_3_width },
-          { input: image3, top: section_3_height, left: 0 },
-          { input: image4, top: 0, left: section_1_width },
-          { input: image5, top: img_4_height, left: section_1_width },
-        ])
+        .composite(payload)
         .toFile(outputPath);
     } catch (error) {
       console.log(error);
@@ -408,6 +448,33 @@ async function generateWallpaper(display, imagePaths) {
         })
         .toBuffer();
 
+      let payload = [
+        { input: image1, top: 0, left: 0 },
+        { input: image2, top: 0, left: img_1_width },
+        { input: image3, top: section_3_height, left: 0 },
+        { input: image4, top: 0, left: section_1_width },
+        { input: image5, top: img_4_height, left: section_1_width },
+        {
+          input: image6,
+          top: img_4_height,
+          left: section_1_width + img_5_width,
+        },
+      ];
+      if (isMirrored) {
+        payload = [
+          { input: image4, top: 0, left: 0 },
+          {
+            input: image6,
+            top: img_4_height,
+            left: 0,
+          },
+          { input: image5, top: img_4_height, left: img_6_width },
+          { input: image2, top: 0, left: section_2_width },
+          { input: image1, top: 0, left: section_2_width + img_2_width },
+          { input: image3, top: section_3_height, left: section_2_width },
+        ];
+      }
+
       await sharp({
         create: {
           width: display.width,
@@ -416,18 +483,7 @@ async function generateWallpaper(display, imagePaths) {
           background: "#000000",
         },
       })
-        .composite([
-          { input: image1, top: 0, left: 0 },
-          { input: image2, top: 0, left: img_1_width },
-          { input: image3, top: section_3_height, left: 0 },
-          { input: image4, top: 0, left: section_1_width },
-          { input: image5, top: img_4_height, left: section_1_width },
-          {
-            input: image6,
-            top: img_4_height,
-            left: section_1_width + img_5_width,
-          },
-        ])
+        .composite(payload)
         .toFile(outputPath);
     } catch (error) {
       console.log(error);
