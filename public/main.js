@@ -42,7 +42,7 @@ let instanceFileList;
 // Requests a generated collage wallpaper from another file and sets it as the wallpaper, reruns every timeInterval unless stopped
 async function changeWallpaper() {
   const settings = getUserSettings();
-  const { directories, isCollage, syncDisplays } = settings;
+  const { directories, isCollage, syncDisplays, maxCollage } = settings;
   const displays = screen.getAllDisplays().map((e) => e.size);
   let fileList = [];
 
@@ -72,7 +72,7 @@ async function changeWallpaper() {
   // If collageNumber is 1 a single image that's landscape will be placed as the desktop wallpaper otherwise it determines the image setup
   let collageNumber = 1;
   if (isCollage) {
-    collageNumber = chooseRandom(1, 6);
+    collageNumber = chooseRandom(1, maxCollage);
     if (collageNumber !== 1) {
       collageNumber = collageNumber * 2;
     }

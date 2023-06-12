@@ -17,6 +17,7 @@ function App() {
   const [timeInterval, setTimeInterval] = useState("");
   const [isCollage, setIsCollage] = useState(false);
   const [syncDisplays, setSyncDisplays] = useState(false);
+  const [maxCollage, setMaxCollage] = useState(6);
   const [processStart, setProcessStart] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const hiddenFileInput = useRef(null);
@@ -27,6 +28,7 @@ function App() {
       setTimeInterval(window.Settings.timeInterval);
       setIsCollage(window.Settings.isCollage);
       setSyncDisplays(window.Settings.syncDisplays);
+      setMaxCollage(window.Settings.maxCollage);
     }
   }, []);
 
@@ -40,7 +42,11 @@ function App() {
   };
 
   const handleSelect = (event) => {
-    setTimeInterval(event.target.value);
+    if (event.target.name === "timeInterval") {
+      setTimeInterval(event.target.value);
+    } else if (event.target.name === "maxCollage") {
+      setMaxCollage(event.target.value);
+    }
   };
 
   const handleCheck = (event) => {
@@ -58,6 +64,7 @@ function App() {
       timeInterval,
       isCollage,
       syncDisplays,
+      maxCollage,
     };
     window.Settings.saveSettings(formData);
   };
@@ -172,8 +179,10 @@ function App() {
                 <option value="10000">10 Seconds</option>
                 <option value="30000">30 Seconds</option>
                 <option value="60000">1 Minute</option>
-                <option value="300000">5 minutes</option>
-                <option value="600000">10 minutes</option>
+                <option value="300000">5 Minutes</option>
+                <option value="600000">10 Minutes</option>
+                <option value="1800000">30 Minutes</option>
+                <option value="3600000">1 Hour</option>
               </select>
             </div>
             <div className="form-item">
@@ -185,6 +194,23 @@ function App() {
                 checked={isCollage}
               />
             </div>
+            {isCollage && (
+              <div className="form-item">
+                <label>Max number of images per collage?</label>
+                <select
+                  name="maxCollage"
+                  defaultValue="6"
+                  onChange={handleSelect}
+                  value={maxCollage}
+                >
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                  <option value="6">6</option>
+                </select>
+              </div>
+            )}
             <div className="form-item">
               <label>Sync Displays?</label>
               <input
