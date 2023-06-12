@@ -6,6 +6,10 @@ import {
   mdiMenuUp,
   mdiDeleteCircle,
   mdiFolderPlus,
+  mdiPlayCircle,
+  mdiPauseCircle,
+  mdiWallpaper,
+  mdiSkipForward,
 } from "@mdi/js";
 // const { ipcRenderer } = window.require("electron");
 // import { ipcRenderer } from "electron";
@@ -99,6 +103,16 @@ function App() {
     hiddenFileInput.current.click();
   };
 
+  const cycleWallpaper = async (event) => {
+    const prevState = processStart;
+    await stopPapetron(event);
+    await startPapetron(event);
+    if (prevState !== true) {
+      stopPapetron(event);
+    }
+    setProcessStart(prevState);
+  };
+
   return (
     <div className="container">
       <div className="settings-container">
@@ -114,22 +128,24 @@ function App() {
         {settingsOpen && (
           <form onSubmit={handleSubmit} className="form-container">
             <div className="directories-container">
-              <label>Image Directories:</label>
-              <input
-                type="file"
-                name="directoryPicker"
-                directory=""
-                webkitdirectory=""
-                multiple=""
-                onChange={handleDirectoryChange}
-                style={{ color: "rgba(0, 0, 0, 0)", display: "none" }}
-                ref={hiddenFileInput}
-              />
+              <div className="form-item">
+                <label>Image Directories:</label>
+                <input
+                  type="file"
+                  name="directoryPicker"
+                  directory=""
+                  webkitdirectory=""
+                  multiple=""
+                  onChange={handleDirectoryChange}
+                  style={{ color: "rgba(0, 0, 0, 0)", display: "none" }}
+                  ref={hiddenFileInput}
+                />
+              </div>
               <div className="selected-directories">
                 {directories
                   ? directories.map((directory, index) => (
                       <li key={index} name={index} className="directory-item">
-                        {directory}
+                        <div className="item-text">{directory}</div>
                         <Icon
                           path={mdiDeleteCircle}
                           size={"1.5rem"}
@@ -151,44 +167,38 @@ function App() {
             </div>
 
             <div className="form-item">
-              <label>
-                Time Interval:
-                <select
-                  name="timeInterval"
-                  defaultValue="30000"
-                  onChange={handleSelect}
-                  value={timeInterval}
-                >
-                  <option value="5000">5 Seconds</option>
-                  <option value="10000">10 Seconds</option>
-                  <option value="30000">30 Seconds</option>
-                  <option value="60000">1 Minute</option>
-                  <option value="300000">5 minutes</option>
-                  <option value="600000">10 minutes</option>
-                </select>
-              </label>
+              <label>Time Interval:</label>
+              <select
+                name="timeInterval"
+                defaultValue="30000"
+                onChange={handleSelect}
+                value={timeInterval}
+              >
+                <option value="5000">5 Seconds</option>
+                <option value="10000">10 Seconds</option>
+                <option value="30000">30 Seconds</option>
+                <option value="60000">1 Minute</option>
+                <option value="300000">5 minutes</option>
+                <option value="600000">10 minutes</option>
+              </select>
             </div>
             <div className="form-item">
-              <label>
-                <input
-                  type="checkbox"
-                  name="isCollage"
-                  onChange={handleCheck}
-                  checked={isCollage}
-                />
-                Collage Images?
-              </label>
+              <label>Collage Images?</label>
+              <input
+                type="checkbox"
+                name="isCollage"
+                onChange={handleCheck}
+                checked={isCollage}
+              />
             </div>
             <div className="form-item">
-              <label>
-                <input
-                  type="checkbox"
-                  name="syncDisplays"
-                  onChange={handleCheck}
-                  checked={syncDisplays}
-                />
-                Sync Displays?
-              </label>
+              <label>Sync Displays?</label>
+              <input
+                type="checkbox"
+                name="syncDisplays"
+                onChange={handleCheck}
+                checked={syncDisplays}
+              />
             </div>
             <button type="submit" value="Submit" className="button-save">
               Save Settings
@@ -197,25 +207,15 @@ function App() {
         )}
       </div>
       <div className="papetron-controls">
-        <button
-          type="start"
-          value="start"
-          name="start-button"
-          onClick={startPapetron}
-          disabled={processStart}
-          className={processStart ? "button-running" : "button-start"}
-        >
-          {processStart ? "Running" : "Start"}
-        </button>
-        <button
-          type="stop"
-          value="stop"
-          name="stop-button"
-          onClick={stopPapetron}
-          disabled={!processStart}
-          className={!processStart ? "button-disabled" : "button-stop"}
-        >
-          Stop
+        <Icon
+          path={processStart ? mdiPauseCircle : mdiPlayCircle}
+          size={3.5}
+          className={"button-start"}
+          onClick={processStart ? stopPapetron : startPapetron}
+        />
+        <button className="next-wallpaper" onClick={cycleWallpaper}>
+          <Icon path={mdiWallpaper} size={2} />
+          <Icon path={mdiSkipForward} size={2} />
         </button>
       </div>
     </div>
