@@ -6,6 +6,7 @@ function getUserSettings() {
   const timeInterval = storage.get("timeInterval");
   const isCollage = storage.get("isCollage");
   const syncDisplays = storage.get("syncDisplays");
+  const windowSize = storage.get("windowSize");
 
   if (timeInterval) {
     const userSettings = {
@@ -13,6 +14,7 @@ function getUserSettings() {
       timeInterval,
       isCollage,
       syncDisplays,
+      windowSize,
     };
     return userSettings;
   } else {

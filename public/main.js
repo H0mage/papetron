@@ -4,6 +4,9 @@ const fs = require("fs");
 const { promisify } = require("util");
 const { getUserSettings, setUserSettings } = require("../src/settings");
 const { generateWallpaper, getSize } = require("../src/generateWallpaper");
+const Store = require("electron-store");
+
+const storage = new Store();
 
 function compare(a, b) {
   if (a.width < b.width) {
@@ -128,12 +131,26 @@ async function changeWallpaper() {
 }
 
 function createWindow() {
-  // Create the browser window.
+  // DEV just to check on the settings while doing changes
+  const settings = getUserSettings();
+  console.log("User Settings:", settings);
+
   const displays = screen.getAllDisplays().map((e) => e.size);
-  const { width, height } = displays[0];
+  let { width, height } = displays[0];
+
+  if (settings.windowSize) {
+    width = settings.windowSize.width;
+    height = settings.windowSize.height;
+  } else {
+    width = Math.floor(width / 4);
+    height = Math.floor(height / 4);
+    storage.set("windowSize", { width, height });
+  }
+
+  // Create the browser window.
   const win = new BrowserWindow({
-    width: Math.floor(width / 100) * 25,
-    height: Math.floor(height / 100) * 25,
+    width: width,
+    height: height,
     autoHideMenuBar: true,
     webPreferences: {
       nodeIntegration: true,
@@ -142,15 +159,16 @@ function createWindow() {
     },
   });
 
-  // DEV just to check on the settings while doing changes
-  const settings = getUserSettings();
-  console.log("User Settings:", settings);
-
   //load the index.html from a url
   win.loadURL("http://localhost:3000");
 
   // Open the DevTools.
   win.webContents.openDevTools();
+
+  win.on("resize", function () {
+    let size = win.getSize();
+    storage.set("windowSize", { width: size[0], height: size[1] });
+  });
 }
 
 // This method will be called when Electron has finished
@@ -209,11 +227,18 @@ ipcMain.on("papetron:stop", function (event) {
 
 ipcMain.on("settings:open", function (event, value) {
   const displays = screen.getAllDisplays().map((e) => e.size);
-  const { width, height } = displays[0];
+  const maxHeight = displays[0].height;
+  let { width, height } = storage.get("windowSize");
   let browserWindow = BrowserWindow.fromWebContents(event.sender);
   if (value === true) {
-    browserWindow.setSize(Math.floor(width / 4), Math.floor(height / 1.5));
+    height =
+      Math.floor(maxHeight / 1.5) < height
+        ? height
+        : Math.floor(maxHeight / 1.5);
+    browserWindow.setSize(width, height);
   } else {
-    browserWindow.setSize(Math.floor(width / 4), Math.floor(height / 4));
+    height = Math.floor(maxHeight / 4);
+    browserWindow.setSize(width, height);
   }
+  storage.set("windowSize", { width, height });
 });
