@@ -6,14 +6,11 @@ import {
   mdiMenuUp,
   mdiDeleteCircle,
   mdiFolderPlus,
-  mdiPlayCircle,
-  mdiPauseCircle,
   mdiWallpaper,
   mdiSkipForward,
+  mdiPlay,
+  mdiPause,
 } from "@mdi/js";
-// const { ipcRenderer } = window.require("electron");
-// import { ipcRenderer } from "electron";
-// import { setUserSettings } from "./settings";
 
 function App() {
   const [directories, setDirectories] = useState([]);
@@ -25,7 +22,6 @@ function App() {
   const hiddenFileInput = useRef(null);
 
   useEffect(() => {
-    console.log(window.Settings);
     if (window) {
       setDirectories(window.Settings.directories);
       setTimeInterval(window.Settings.timeInterval);
@@ -36,7 +32,6 @@ function App() {
 
   const handleDirectoryChange = (event) => {
     const directory = event.target.files[0].path.split("\\");
-    console.log(directory);
     directory.pop();
     const finalPath = directory.join("\\");
     event.target.value = null;
@@ -49,9 +44,6 @@ function App() {
   };
 
   const handleCheck = (event) => {
-    console.log(event.target.value);
-    console.log(event.target.name);
-    console.log(event.target.checked);
     if (event.target.name === "isCollage") {
       setIsCollage(event.target.checked);
     } else if (event.target.name === "syncDisplays") {
@@ -61,8 +53,6 @@ function App() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    console.log(event);
-    console.log(directories, timeInterval, isCollage, syncDisplays);
     const formData = {
       directories,
       timeInterval,
@@ -70,32 +60,32 @@ function App() {
       syncDisplays,
     };
     window.Settings.saveSettings(formData);
-    // setUserSettings(formData);
   };
 
   const removeDirectoryHandler = (index) => {
-    console.log("you want to delete me", index);
     const directoriesCopy = directories.slice();
     directoriesCopy.splice(index, 1);
     setDirectories(directoriesCopy);
   };
 
   const startPapetron = (event) => {
-    console.log("start", event);
     event.preventDefault();
     setProcessStart(true);
     window.Papetron.start();
   };
 
   const stopPapetron = (event) => {
-    console.log("stop", event);
     event.preventDefault();
     setProcessStart(false);
     window.Papetron.stop();
   };
 
   const handleMenu = (event) => {
-    console.log("menu", event);
+    if (!settingsOpen) {
+      window.Settings.settingsOpen(true);
+    } else {
+      window.Settings.settingsOpen(false);
+    }
     setSettingsOpen(!settingsOpen);
   };
 
@@ -115,8 +105,8 @@ function App() {
 
   return (
     <div className="container">
-      <div className="settings-container">
-        <div className="settings-title">
+      <div className={`settings-container ${settingsOpen && "settings-open"}`}>
+        <div className="settings-title" onClick={handleMenu}>
           <div className="title">Settings:</div>
           <Icon
             path={settingsOpen ? mdiMenuUp : mdiMenuDown}
@@ -155,11 +145,15 @@ function App() {
                       </li>
                     ))
                   : ""}
-                <li key={"add"} name={"add"} className="add-item">
+                <li
+                  key={"add"}
+                  name={"add"}
+                  className="add-item"
+                  onClick={triggerDirectorySearch}
+                >
                   <Icon
                     path={mdiFolderPlus}
                     size={"1.5rem"}
-                    onClick={triggerDirectorySearch}
                     className="add-icon"
                   />
                 </li>
@@ -207,12 +201,12 @@ function App() {
         )}
       </div>
       <div className="papetron-controls">
-        <Icon
-          path={processStart ? mdiPauseCircle : mdiPlayCircle}
-          size={3.5}
-          className={"button-start"}
+        <button
+          className="button-start"
           onClick={processStart ? stopPapetron : startPapetron}
-        />
+        >
+          <Icon path={processStart ? mdiPause : mdiPlay} size={"4rem"} />
+        </button>
         <button className="next-wallpaper" onClick={cycleWallpaper}>
           <Icon path={mdiWallpaper} size={2} />
           <Icon path={mdiSkipForward} size={2} />

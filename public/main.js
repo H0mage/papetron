@@ -129,9 +129,11 @@ async function changeWallpaper() {
 
 function createWindow() {
   // Create the browser window.
+  const displays = screen.getAllDisplays().map((e) => e.size);
+  const { width, height } = displays[0];
   const win = new BrowserWindow({
-    width: 500,
-    height: 800,
+    width: Math.floor(width / 100) * 25,
+    height: Math.floor(height / 100) * 25,
     autoHideMenuBar: true,
     webPreferences: {
       nodeIntegration: true,
@@ -185,7 +187,6 @@ app.on("activate", () => {
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
 ipcMain.on("save:settings", function (event, formData) {
-  console.log("newData from submit", formData);
   instanceFileList = [];
   setUserSettings(formData);
 });
@@ -203,6 +204,16 @@ ipcMain.on("papetron:start", function (event) {
 });
 
 ipcMain.on("papetron:stop", function (event) {
-  console.log("stoppo");
   clearInterval(intervalId);
+});
+
+ipcMain.on("settings:open", function (event, value) {
+  const displays = screen.getAllDisplays().map((e) => e.size);
+  const { width, height } = displays[0];
+  let browserWindow = BrowserWindow.fromWebContents(event.sender);
+  if (value === true) {
+    browserWindow.setSize(Math.floor(width / 4), Math.floor(height / 1.5));
+  } else {
+    browserWindow.setSize(Math.floor(width / 4), Math.floor(height / 4));
+  }
 });

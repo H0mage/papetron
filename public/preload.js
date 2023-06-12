@@ -9,8 +9,12 @@ contextBridge.exposeInMainWorld("Settings", {
   timeInterval: () => store.get("timeInterval"),
   isCollage: () => store.get("isCollage"),
   syncDisplays: () => store.get("syncDisplays"),
+  windowSize: () => store.get("windowSize"),
+  maxCollage: () => store.get("maxCollage"),
+  keepRunning: () => store.get("keepRunning"),
   settings: () => ipcRenderer.invoke("settings").then((result) => result),
   saveSettings: (formData) => ipcRenderer.send("save:settings", formData),
+  settingsOpen: (value) => ipcRenderer.send("settings:open", value),
 });
 
 // Wallpaper actions
