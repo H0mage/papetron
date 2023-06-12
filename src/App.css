@@ -1,38 +1,76 @@
-.App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.container{
   display: flex;
   flex-direction: column;
-  align-items: center;
+  padding: 1rem;
+  background-color: rgb(16, 61, 51);
+  height: 100vh;
+  box-sizing: border-box;
+  color: rgb(157, 206, 213);
+}
+
+.settings-container{
+  border: black 0.1rem solid ;
+  background-color: rgb(18, 122, 99);
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.settings-title{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  font-size: 1.5rem;
+}
+
+.directories-container{
+  display: flex;
+  flex-direction: column;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
+  align-items: center;
+}
+
+.selected-directories{
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 1rem 0;
+  background-color: rgb(46, 74, 68);
   color: white;
+  border: rgb(46, 74, 68) 0.15rem solid;
+  border-radius: 0.7rem;
+  gap: 0.2rem;
 }
 
-.App-link {
-  color: #61dafb;
+.directory-item{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  text-decoration: none;
+  border: white 0.05rem solid;
+  padding: 0.25rem 1rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.delete-icon{
+  background-color: rgb(46, 74, 68);
+  color: rgb(203, 58, 58);
 }
+
+.add-item{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
+  border: white 0.05rem solid;
+  padding: 0.25rem 1rem;
+}
+
+.add-icon{
+  color: greenyellow
+}
+

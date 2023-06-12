@@ -1,5 +1,12 @@
 import "./App.css";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import Icon from "@mdi/react";
+import {
+  mdiMenuDown,
+  mdiMenuUp,
+  mdiDeleteCircle,
+  mdiFolderPlus,
+} from "@mdi/js";
 // const { ipcRenderer } = window.require("electron");
 // import { ipcRenderer } from "electron";
 // import { setUserSettings } from "./settings";
@@ -10,6 +17,8 @@ function App() {
   const [isCollage, setIsCollage] = useState(false);
   const [syncDisplays, setSyncDisplays] = useState(false);
   const [processStart, setProcessStart] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const hiddenFileInput = useRef(null);
 
   useEffect(() => {
     console.log(window.Settings);
@@ -81,89 +90,134 @@ function App() {
     window.Papetron.stop();
   };
 
+  const handleMenu = (event) => {
+    console.log("menu", event);
+    setSettingsOpen(!settingsOpen);
+  };
+
+  const triggerDirectorySearch = () => {
+    hiddenFileInput.current.click();
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <div className="Title">Papetron</div>
-        <form onSubmit={handleSubmit}>
-          <input
-            type="file"
-            name="directoryPicker"
-            directory=""
-            webkitdirectory=""
-            multiple=""
-            onChange={handleDirectoryChange}
-            style={{ color: "rgba(0, 0, 0, 0)" }}
+    <div className="container">
+      <div className="settings-container">
+        <div className="settings-title">
+          <div className="title">Settings:</div>
+          <Icon
+            path={settingsOpen ? mdiMenuUp : mdiMenuDown}
+            size={"2rem"}
+            onClick={handleMenu}
+            className="collapse-arrow"
           />
-          <p>Selected Directories: </p>
-          <div>
-            {directories
-              ? directories.map((directory, index) => (
-                  <li key={index} name={index} className="directoryItem">
-                    {directory}{" "}
-                    <span onClick={() => removeDirectoryHandler(index)}>X</span>
-                  </li>
-                ))
-              : ""}
-          </div>
-          <label>
-            Time Interval:
-            <select
-              name="timeInterval"
-              defaultValue="30000"
-              onChange={handleSelect}
-              value={timeInterval}
-            >
-              <option value="5000">5 Seconds</option>
-              <option value="10000">10 Seconds</option>
-              <option value="30000">30 Seconds</option>
-              <option value="60000">1 Minute</option>
-              <option value="300000">5 minutes</option>
-              <option value="600000">10 minutes</option>
-            </select>
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              name="isCollage"
-              onChange={handleCheck}
-              checked={isCollage}
-            />
-            Collage Images?
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              name="syncDisplays"
-              onChange={handleCheck}
-              checked={syncDisplays}
-            />
-            Sync Displays?
-          </label>
-          <button type="submit" value="Submit">
-            Save Settings
-          </button>
-        </form>
-        <div>
-          <button
-            type="start"
-            value="start"
-            name="start-button"
-            onClick={startPapetron}
-            disabled={processStart}
-          >
-            {processStart ? "Running" : "Start"}
-          </button>
-          <button
-            type="stop"
-            value="stop"
-            name="stop-button"
-            onClick={stopPapetron}
-          >
-            Stop
-          </button>
         </div>
-      </header>
+        {settingsOpen && (
+          <form onSubmit={handleSubmit} className="form-container">
+            <div className="directories-container">
+              <label>Image Directories:</label>
+              <input
+                type="file"
+                name="directoryPicker"
+                directory=""
+                webkitdirectory=""
+                multiple=""
+                onChange={handleDirectoryChange}
+                style={{ color: "rgba(0, 0, 0, 0)", display: "none" }}
+                ref={hiddenFileInput}
+              />
+              <div className="selected-directories">
+                {directories
+                  ? directories.map((directory, index) => (
+                      <li key={index} name={index} className="directory-item">
+                        {directory}
+                        <Icon
+                          path={mdiDeleteCircle}
+                          size={"1.5rem"}
+                          onClick={() => removeDirectoryHandler(index)}
+                          className="delete-icon"
+                        />
+                      </li>
+                    ))
+                  : ""}
+                <li key={"add"} name={"add"} className="add-item">
+                  <Icon
+                    path={mdiFolderPlus}
+                    size={"1.5rem"}
+                    onClick={triggerDirectorySearch}
+                    className="add-icon"
+                  />
+                </li>
+              </div>
+            </div>
+
+            <div className="form-item">
+              <label>
+                Time Interval:
+                <select
+                  name="timeInterval"
+                  defaultValue="30000"
+                  onChange={handleSelect}
+                  value={timeInterval}
+                >
+                  <option value="5000">5 Seconds</option>
+                  <option value="10000">10 Seconds</option>
+                  <option value="30000">30 Seconds</option>
+                  <option value="60000">1 Minute</option>
+                  <option value="300000">5 minutes</option>
+                  <option value="600000">10 minutes</option>
+                </select>
+              </label>
+            </div>
+            <div className="form-item">
+              <label>
+                <input
+                  type="checkbox"
+                  name="isCollage"
+                  onChange={handleCheck}
+                  checked={isCollage}
+                />
+                Collage Images?
+              </label>
+            </div>
+            <div className="form-item">
+              <label>
+                <input
+                  type="checkbox"
+                  name="syncDisplays"
+                  onChange={handleCheck}
+                  checked={syncDisplays}
+                />
+                Sync Displays?
+              </label>
+            </div>
+            <button type="submit" value="Submit" className="button-save">
+              Save Settings
+            </button>
+          </form>
+        )}
+      </div>
+      <div className="papetron-controls">
+        <button
+          type="start"
+          value="start"
+          name="start-button"
+          onClick={startPapetron}
+          disabled={processStart}
+          className={processStart ? "button-running" : "button-start"}
+        >
+          {processStart ? "Running" : "Start"}
+        </button>
+        <button
+          type="stop"
+          value="stop"
+          name="stop-button"
+          onClick={stopPapetron}
+          disabled={!processStart}
+          className={!processStart ? "button-disabled" : "button-stop"}
+        >
+          Stop
+        </button>
+      </div>
     </div>
   );
 }
