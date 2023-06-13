@@ -2,7 +2,7 @@
   "name": "papetron",
   "version": "0.1.0",
   "private": true,
-  "main": "public/main.js",
+  "main": "public/electron.js",
   "author": "John Cabrera",
   "description": "Wallpaper electron app to collage images",
   "dependencies": {
@@ -27,7 +27,7 @@
     "eject": "react-scripts eject",
     "electron-dev": "electron .",
     "app:dir": "electron-builder --dir",
-    "app:dist": "electron-builder",
+    "app:dist": "electron-builder -mwl",
     "postinstall": "electron-builder install-app-deps"
   },
   "eslintConfig": {
