@@ -12,6 +12,18 @@ let win = null;
 
 let tray = null;
 
+function papetronStart() {
+  instanceFileList = [];
+  const settings = getUserSettings();
+  const { timeInterval } = settings;
+  changeWallpaper();
+  intervalId = setInterval(changeWallpaper, timeInterval);
+}
+
+function papetronStop() {
+  clearInterval(intervalId);
+}
+
 function compare(a, b) {
   if (a.width < b.width) {
     return -1;
@@ -135,11 +147,9 @@ async function changeWallpaper() {
 }
 
 function createWindow() {
-  console.log(win);
   if (win === null) {
     // DEV just to check on the settings while doing changes
     const settings = getUserSettings();
-    console.log("User Settings:", settings);
 
     const displays = screen.getAllDisplays().map((e) => e.size);
     let { width, height } = displays[0];
@@ -183,13 +193,16 @@ function createWindow() {
     });
 
     win.on("close", function (event) {
-      if (!app.isQuiting) {
+      const settings = getUserSettings();
+      console.log("User Settings:", settings);
+      if (settings.keepRunning === true) {
         event.preventDefault();
         win.hide();
         win = null;
+        return false;
       }
-
-      return false;
+      app.quit();
+      win = null;
     });
   }
 }
@@ -214,6 +227,24 @@ app.whenReady().then(() => {
       },
     },
     {
+      label: "Start",
+      click: function () {
+        papetronStart();
+      },
+    },
+    {
+      label: "Pause",
+      click: function () {
+        papetronStop();
+      },
+    },
+    {
+      label: "Next Wallpaper",
+      click: function () {
+        changeWallpaper();
+      },
+    },
+    {
       label: "Quit",
       click: function () {
         app.isQuiting = true;
@@ -221,8 +252,11 @@ app.whenReady().then(() => {
       },
     },
   ]);
-  tray.setToolTip("This is my application");
+  tray.setToolTip("Papetron");
   tray.setContextMenu(contextMenu);
+  tray.on("click", () => {
+    createWindow();
+  });
 
   createWindow();
 });
@@ -233,7 +267,6 @@ app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
     app.quit();
   }
-  win = null;
 });
 
 app.on("activate", () => {
@@ -257,15 +290,11 @@ ipcMain.on("settings:saved", function (event, message) {
 });
 
 ipcMain.on("papetron:start", function (event) {
-  instanceFileList = [];
-  const settings = getUserSettings();
-  const { timeInterval } = settings;
-  changeWallpaper();
-  intervalId = setInterval(changeWallpaper, timeInterval);
+  papetronStart();
 });
 
 ipcMain.on("papetron:stop", function (event) {
-  clearInterval(intervalId);
+  papetronStop();
 });
 
 ipcMain.on("settings:open", function (event, value) {

@@ -18,6 +18,7 @@ function App() {
   const [isCollage, setIsCollage] = useState(false);
   const [syncDisplays, setSyncDisplays] = useState(false);
   const [maxCollage, setMaxCollage] = useState(6);
+  const [keepRunning, setKeepRunning] = useState(true);
   const [processStart, setProcessStart] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const hiddenFileInput = useRef(null);
@@ -29,6 +30,7 @@ function App() {
       setIsCollage(window.Settings.isCollage);
       setSyncDisplays(window.Settings.syncDisplays);
       setMaxCollage(window.Settings.maxCollage);
+      setKeepRunning(window.Settings.keepRunning);
     }
   }, []);
 
@@ -54,6 +56,8 @@ function App() {
       setIsCollage(event.target.checked);
     } else if (event.target.name === "syncDisplays") {
       setSyncDisplays(event.target.checked);
+    } else if (event.target.name === "keepRunning") {
+      setKeepRunning(event.target.checked);
     }
   };
 
@@ -65,6 +69,7 @@ function App() {
       isCollage,
       syncDisplays,
       maxCollage,
+      keepRunning,
     };
     window.Settings.saveSettings(formData);
   };
@@ -124,6 +129,15 @@ function App() {
         </div>
         {settingsOpen && (
           <form onSubmit={handleSubmit} className="form-container">
+            <div className="form-item">
+              <label>Minimize to tray on close?</label>
+              <input
+                type="checkbox"
+                name="keepRunning"
+                onChange={handleCheck}
+                checked={keepRunning}
+              />
+            </div>
             <div className="directories-container">
               <div className="form-item">
                 <label>Image Directories:</label>
