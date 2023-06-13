@@ -130,15 +130,6 @@ function App() {
         </div>
         {settingsOpen && (
           <form onSubmit={handleSubmit} className="form-container">
-            <div className="form-item">
-              <label>Minimize to tray on close?</label>
-              <input
-                type="checkbox"
-                name="keepRunning"
-                onChange={handleCheck}
-                checked={keepRunning}
-              />
-            </div>
             <div className="directories-container">
               <div className="form-item">
                 <label>Image Directories:</label>
@@ -226,13 +217,22 @@ function App() {
                 </select>
               </div>
             )}
-            <div className="form-item">
+            {/* <div className="form-item">
               <label>Sync Displays?</label>
               <input
                 type="checkbox"
                 name="syncDisplays"
                 onChange={handleCheck}
                 checked={syncDisplays}
+              />
+            </div> */}
+            <div className="form-item">
+              <label>Minimize to tray on close?</label>
+              <input
+                type="checkbox"
+                name="keepRunning"
+                onChange={handleCheck}
+                checked={keepRunning}
               />
             </div>
             <button type="submit" value="Submit" className="button-save">
@@ -245,10 +245,15 @@ function App() {
         <button
           className="button-start"
           onClick={processStart ? stopPapetron : startPapetron}
+          title={processStart ? "Pause" : "Start"}
         >
           <Icon path={processStart ? mdiPause : mdiPlay} size={"4rem"} />
         </button>
-        <button className="next-wallpaper" onClick={cycleWallpaper}>
+        <button
+          className="next-wallpaper"
+          onClick={cycleWallpaper}
+          title="Next Wallpaper"
+        >
           <Icon path={mdiWallpaper} size={2} />
           <Icon path={mdiSkipForward} size={2} />
         </button>

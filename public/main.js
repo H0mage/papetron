@@ -98,9 +98,9 @@ async function changeWallpaper() {
   }
 
   // TO DO: if display rotation works to make it so they all change at the same time
-  if (syncDisplays) {
-    console.log("Number of displays", displays.length);
-  }
+  // if (syncDisplays) {
+  //   console.log("Number of displays", displays.length);
+  // }
 
   // Randomly select the images to be placed in the collage, at present doing twice the amount needed for more available picture sizes
   let collageImages = [];
@@ -150,11 +150,8 @@ async function changeWallpaper() {
 }
 
 function createWindow() {
-  console.log(win);
   if (win === null) {
-    // DEV just to check on the settings while doing changes
     const settings = getUserSettings();
-    console.log("User Settings:", settings);
 
     const displays = screen.getAllDisplays().map((e) => e.size);
     let { width, height } = displays[0];
@@ -192,16 +189,13 @@ function createWindow() {
     });
 
     win.on("minimize", function (event) {
-      console.log("minimize");
       event.preventDefault();
       win.hide();
       win = null;
     });
 
     win.on("close", function (event) {
-      console.log("close");
       const settings = getUserSettings();
-      console.log("User Settings:", settings);
       if (settings.keepRunning !== true || win === null) {
         app.quit();
         return;
@@ -292,12 +286,11 @@ app.on("activate", () => {
 // code. You can also put them in separate files and require them here.
 ipcMain.on("save:settings", function (event, formData) {
   instanceFileList = [];
-  console.log(formData);
   setUserSettings(formData);
 });
 
 ipcMain.on("settings:saved", function (event, message) {
-  console.log(getUserSettings());
+  // console.log(getUserSettings());
 });
 
 ipcMain.on("papetron:start", function (event) {

@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "main": "public/main.js",
+  "author": "John Cabrera",
+  "description": "Wallpaper electron app to collage images",
   "dependencies": {
     "@mdi/js": "^7.2.96",
     "@mdi/react": "^1.6.1",
@@ -46,4 +48,5 @@
   "devDependencies": {
     "electron": "^25.0.0"
   }
+
 }

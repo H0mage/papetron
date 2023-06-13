@@ -55,6 +55,7 @@
   text-decoration: none;
   padding: 0.25rem 0.5rem;
   background-color: rgb(46, 74, 68);
+  vertical-align: baseline;
 }
 
 .item-text{
