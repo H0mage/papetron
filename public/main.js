@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, screen } = require("electron");
+const { app, BrowserWindow, ipcMain, screen, Tray, Menu } = require("electron");
 const path = require("path");
 const fs = require("fs");
 const { promisify } = require("util");
@@ -7,6 +7,10 @@ const { generateWallpaper, getSize } = require("../src/generateWallpaper");
 const Store = require("electron-store");
 
 const storage = new Store();
+
+let win = null;
+
+let tray = null;
 
 function compare(a, b) {
   if (a.width < b.width) {
@@ -131,44 +135,63 @@ async function changeWallpaper() {
 }
 
 function createWindow() {
-  // DEV just to check on the settings while doing changes
-  const settings = getUserSettings();
-  console.log("User Settings:", settings);
+  console.log(win);
+  if (win === null) {
+    // DEV just to check on the settings while doing changes
+    const settings = getUserSettings();
+    console.log("User Settings:", settings);
 
-  const displays = screen.getAllDisplays().map((e) => e.size);
-  let { width, height } = displays[0];
+    const displays = screen.getAllDisplays().map((e) => e.size);
+    let { width, height } = displays[0];
 
-  if (settings.windowSize) {
-    width = settings.windowSize.width;
-    height = settings.windowSize.height;
-  } else {
-    width = Math.floor(width / 4);
-    height = Math.floor(height / 4);
-    storage.set("windowSize", { width, height });
+    if (settings.windowSize) {
+      width = settings.windowSize.width;
+      height = settings.windowSize.height;
+    } else {
+      width = Math.floor(width / 4);
+      height = Math.floor(height / 4);
+      storage.set("windowSize", { width, height });
+    }
+
+    // Create the browser window.
+    win = new BrowserWindow({
+      width: width,
+      height: height,
+      autoHideMenuBar: true,
+      webPreferences: {
+        nodeIntegration: true,
+        enableRemoteModule: true,
+        preload: path.join(__dirname, "preload.js"),
+      },
+    });
+
+    //load the index.html from a url
+    win.loadURL("http://localhost:3000");
+
+    // Open the DevTools.
+    win.webContents.openDevTools();
+
+    win.on("resize", function () {
+      let size = win.getSize();
+      storage.set("windowSize", { width: size[0], height: size[1] });
+    });
+
+    win.on("minimize", function (event) {
+      event.preventDefault();
+      win.hide();
+      win = null;
+    });
+
+    win.on("close", function (event) {
+      if (!app.isQuiting) {
+        event.preventDefault();
+        win.hide();
+        win = null;
+      }
+
+      return false;
+    });
   }
-
-  // Create the browser window.
-  const win = new BrowserWindow({
-    width: width,
-    height: height,
-    autoHideMenuBar: true,
-    webPreferences: {
-      nodeIntegration: true,
-      enableRemoteModule: true,
-      preload: path.join(__dirname, "preload.js"),
-    },
-  });
-
-  //load the index.html from a url
-  win.loadURL("http://localhost:3000");
-
-  // Open the DevTools.
-  win.webContents.openDevTools();
-
-  win.on("resize", function () {
-    let size = win.getSize();
-    storage.set("windowSize", { width: size[0], height: size[1] });
-  });
 }
 
 // This method will be called when Electron has finished
@@ -182,6 +205,25 @@ app.whenReady().then(() => {
     if (err) throw err;
   });
 
+  tray = new Tray(path.join(__dirname, "icon.png"));
+  const contextMenu = Menu.buildFromTemplate([
+    {
+      label: "Show App",
+      click: function () {
+        createWindow();
+      },
+    },
+    {
+      label: "Quit",
+      click: function () {
+        app.isQuiting = true;
+        app.quit();
+      },
+    },
+  ]);
+  tray.setToolTip("This is my application");
+  tray.setContextMenu(contextMenu);
+
   createWindow();
 });
 // Quit when all windows are closed, except on macOS. There, it's common
@@ -191,6 +233,7 @@ app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
     app.quit();
   }
+  win = null;
 });
 
 app.on("activate", () => {
