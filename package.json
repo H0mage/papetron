@@ -25,7 +25,10 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "electron-dev": "electron ."
+    "electron-dev": "electron .",
+    "app:dir": "electron-builder --dir",
+    "app:dist": "electron-builder",
+    "postinstall": "electron-builder install-app-deps"
   },
   "eslintConfig": {
     "extends": [
@@ -46,7 +49,13 @@
     ]
   },
   "devDependencies": {
-    "electron": "^25.0.0"
+    "electron": "^25.0.0",
+    "electron-builder": "^23.6.0"
+  },
+  "build": {
+    "appId": "com.electron.papetron",
+    "mac": {
+      "category": "public.app-category.utilities"
+    }
   }
-
 }
