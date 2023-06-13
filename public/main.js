@@ -12,7 +12,20 @@ let win = null;
 
 let tray = null;
 
+// promisified readdir in order to read all the directories in settings
+const readdir = promisify(fs.readdir);
+
+// For reseting the repeating callback once stop is pressed
+let intervalId;
+// For knowing how many displays there are in order to cycle which display changing wallpaper
+let displayCount = 0;
+// To keep a memory of the fileList of all the possible image paths to select, refreshes on settings change or start
+let instanceFileList;
+
 function papetronStart() {
+  if (intervalId) {
+    clearInterval(intervalId);
+  }
   instanceFileList = [];
   const settings = getUserSettings();
   const { timeInterval } = settings;
@@ -44,16 +57,6 @@ function shuffleArray(array) {
     [array[i], array[j]] = [array[j], array[i]];
   }
 }
-
-// promisified readdir in order to read all the directories in settings
-const readdir = promisify(fs.readdir);
-
-// For reseting the repeating callback once stop is pressed
-let intervalId;
-// For knowing how many displays there are in order to cycle which display changing wallpaper
-let displayCount = 0;
-// To keep a memory of the fileList of all the possible image paths to select, refreshes on settings change or start
-let instanceFileList;
 
 // Requests a generated collage wallpaper from another file and sets it as the wallpaper, reruns every timeInterval unless stopped
 async function changeWallpaper() {
@@ -147,9 +150,11 @@ async function changeWallpaper() {
 }
 
 function createWindow() {
+  console.log(win);
   if (win === null) {
     // DEV just to check on the settings while doing changes
     const settings = getUserSettings();
+    console.log("User Settings:", settings);
 
     const displays = screen.getAllDisplays().map((e) => e.size);
     let { width, height } = displays[0];
@@ -187,22 +192,24 @@ function createWindow() {
     });
 
     win.on("minimize", function (event) {
+      console.log("minimize");
       event.preventDefault();
       win.hide();
       win = null;
     });
 
     win.on("close", function (event) {
+      console.log("close");
       const settings = getUserSettings();
       console.log("User Settings:", settings);
-      if (settings.keepRunning === true) {
+      if (settings.keepRunning !== true || win === null) {
+        app.quit();
+        return;
+      } else {
         event.preventDefault();
         win.hide();
         win = null;
-        return false;
       }
-      app.quit();
-      win = null;
     });
   }
 }
@@ -248,6 +255,7 @@ app.whenReady().then(() => {
       label: "Quit",
       click: function () {
         app.isQuiting = true;
+        win = null;
         app.quit();
       },
     },
@@ -257,6 +265,8 @@ app.whenReady().then(() => {
   tray.on("click", () => {
     createWindow();
   });
+
+  storage.set("isRunning", false);
 
   createWindow();
 });
@@ -282,6 +292,7 @@ app.on("activate", () => {
 // code. You can also put them in separate files and require them here.
 ipcMain.on("save:settings", function (event, formData) {
   instanceFileList = [];
+  console.log(formData);
   setUserSettings(formData);
 });
 

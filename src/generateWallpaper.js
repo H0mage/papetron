@@ -108,6 +108,7 @@ async function generateWallpaper(display, imagePaths) {
           // // gravity: sizeArray[3].gravity,
           strategy: sizeArray[3].strategy,
         })
+        .png({ quality: 100 })
         .toBuffer();
 
       const image2 = await sharp(sizeArray[0].path)
@@ -118,6 +119,7 @@ async function generateWallpaper(display, imagePaths) {
           // // gravity: sizeArray[0].gravity,
           strategy: sizeArray[0].strategy,
         })
+        .png({ quality: 100 })
         .toBuffer();
 
       let payload = [
@@ -160,6 +162,7 @@ async function generateWallpaper(display, imagePaths) {
           // // gravity: sizeArray[3].gravity,
           strategy: sizeArray[3].strategy,
         })
+        .png({ quality: 100 })
         .toBuffer();
 
       const image2 = await sharp(sizeArray[4].path)
@@ -170,6 +173,7 @@ async function generateWallpaper(display, imagePaths) {
           // // gravity: sizeArray[4].gravity,
           strategy: sizeArray[4].strategy,
         })
+        .png({ quality: 100 })
         .toBuffer();
 
       const image3 = await sharp(sizeArray[5].path)
@@ -180,6 +184,7 @@ async function generateWallpaper(display, imagePaths) {
           // // gravity: sizeArray[5].gravity,
           strategy: sizeArray[5].strategy,
         })
+        .png({ quality: 100 })
         .toBuffer();
 
       let payload = [
@@ -225,6 +230,7 @@ async function generateWallpaper(display, imagePaths) {
           // gravity: sizeArray[4].gravity,
           strategy: sizeArray[4].strategy,
         })
+        .png({ quality: 100 })
         .toBuffer();
 
       const image2 = await sharp(sizeArray[5].path)
@@ -235,6 +241,7 @@ async function generateWallpaper(display, imagePaths) {
           // gravity: sizeArray[5].gravity,
           strategy: sizeArray[5].strategy,
         })
+        .png({ quality: 100 })
         .toBuffer();
 
       const image3 = await sharp(sizeArray[7].path)
@@ -245,6 +252,7 @@ async function generateWallpaper(display, imagePaths) {
           // // gravity: sizeArray[7].gravity,
           strategy: sizeArray[7].strategy,
         })
+        .png({ quality: 100 })
         .toBuffer();
 
       const image4 = await sharp(sizeArray[0].path)
@@ -255,6 +263,7 @@ async function generateWallpaper(display, imagePaths) {
           // // gravity: sizeArray[0].gravity,
           strategy: sizeArray[0].strategy,
         })
+        .png({ quality: 100 })
         .toBuffer();
 
       let payload = [
@@ -303,6 +312,7 @@ async function generateWallpaper(display, imagePaths) {
           // // gravity: sizeArray[4].gravity,
           strategy: sizeArray[4].strategy,
         })
+        .png({ quality: 100 })
         .toBuffer();
 
       const image2 = await sharp(sizeArray[5].path)
@@ -313,6 +323,7 @@ async function generateWallpaper(display, imagePaths) {
           // // gravity: sizeArray[5].gravity,
           strategy: sizeArray[5].strategy,
         })
+        .png({ quality: 100 })
         .toBuffer();
 
       const image3 = await sharp(sizeArray[9].path)
@@ -323,6 +334,7 @@ async function generateWallpaper(display, imagePaths) {
           // // gravity: sizeArray[9].gravity,
           strategy: sizeArray[9].strategy,
         })
+        .png({ quality: 100 })
         .toBuffer();
 
       const image4 = await sharp(sizeArray[6].path)
@@ -333,6 +345,7 @@ async function generateWallpaper(display, imagePaths) {
           // // gravity: sizeArray[6].gravity,
           strategy: sizeArray[6].strategy,
         })
+        .png({ quality: 100 })
         .toBuffer();
 
       const image5 = await sharp(sizeArray[8].path)
@@ -343,6 +356,7 @@ async function generateWallpaper(display, imagePaths) {
           // // gravity: sizeArray[8].gravity,
           strategy: sizeArray[8].strategy,
         })
+        .png({ quality: 100 })
         .toBuffer();
 
       let payload = [
@@ -396,6 +410,7 @@ async function generateWallpaper(display, imagePaths) {
           // // gravity: sizeArray[0].gravity,
           strategy: sizeArray[0].strategy,
         })
+        .png({ quality: 100 })
         .toBuffer();
 
       const image2 = await sharp(sizeArray[7].path)
@@ -406,6 +421,7 @@ async function generateWallpaper(display, imagePaths) {
           // // gravity: sizeArray[7].gravity,
           strategy: sizeArray[7].strategy,
         })
+        .png({ quality: 100 })
         .toBuffer();
 
       const image3 = await sharp(sizeArray[11].path)
@@ -416,6 +432,7 @@ async function generateWallpaper(display, imagePaths) {
           // // gravity: sizeArray[11].gravity,
           strategy: sizeArray[11].strategy,
         })
+        .png({ quality: 100 })
         .toBuffer();
 
       const image4 = await sharp(sizeArray[9].path)
@@ -426,6 +443,7 @@ async function generateWallpaper(display, imagePaths) {
           // // gravity: sizeArray[9].gravity,
           strategy: sizeArray[9].strategy,
         })
+        .png({ quality: 100 })
         .toBuffer();
 
       const image5 = await sharp(sizeArray[2].path)
@@ -436,6 +454,7 @@ async function generateWallpaper(display, imagePaths) {
           // // gravity: sizeArray[2].gravity,
           strategy: sizeArray[2].strategy,
         })
+        .png({ quality: 100 })
         .toBuffer();
 
       const image6 = await sharp(sizeArray[1].path)
@@ -446,6 +465,7 @@ async function generateWallpaper(display, imagePaths) {
           // // gravity: sizeArray[1].gravity,
           strategy: sizeArray[1].strategy,
         })
+        .png({ quality: 100 })
         .toBuffer();
 
       let payload = [

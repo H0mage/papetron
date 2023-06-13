@@ -19,6 +19,13 @@ contextBridge.exposeInMainWorld("Settings", {
 
 // Wallpaper actions
 contextBridge.exposeInMainWorld("Papetron", {
-  start: () => ipcRenderer.send("papetron:start"),
-  stop: () => ipcRenderer.send("papetron:stop"),
+  start: () => {
+    ipcRenderer.send("papetron:start");
+    store.set("isRunning", true);
+  },
+  stop: () => {
+    ipcRenderer.send("papetron:stop");
+    store.set("isRunning", false);
+  },
+  isRunning: () => store.get("isRunning"),
 });

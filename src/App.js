@@ -31,6 +31,7 @@ function App() {
       setSyncDisplays(window.Settings.syncDisplays);
       setMaxCollage(window.Settings.maxCollage);
       setKeepRunning(window.Settings.keepRunning);
+      setProcessStart(window.Papetron.isRunning);
     }
   }, []);
 
