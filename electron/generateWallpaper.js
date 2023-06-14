@@ -1,5 +1,7 @@
+import { setWallpaper } from "wallpaper";
 const path = require("path");
 const sharp = require("sharp");
+const isDev = require("electron-is-dev");
 
 const positions = [
   "centre",
@@ -83,11 +85,16 @@ async function getSizes(pathArray) {
   return sizeArray.sort(compare);
 }
 
-async function generateWallpaper(display, imagePaths) {
+async function generateWallpaper(display, imagePaths, imagePath) {
   // We are using double the images for sample size so here we get the actual number of images we need for the collage
   const collageNumber = imagePaths.length / 2;
+  let outputPath;
 
-  const outputPath = path.join(__dirname, "../temp/tempWallpaper.png");
+  if (isDev) {
+    outputPath = path.join(__dirname, "../temp/tempWallpaper.png");
+  } else {
+    outputPath = imagePath;
+  }
 
   // Arranges the images based on aspect ratio. < 1 : Vertical || == 1 : Square || > 1 : Horizontal
   const sizeArray = await getSizes(imagePaths);
@@ -512,4 +519,8 @@ async function generateWallpaper(display, imagePaths) {
   return outputPath;
 }
 
-module.exports = { generateWallpaper, getSize };
+function nextWallpaper(path) {
+  setWallpaper(path);
+}
+
+module.exports = { generateWallpaper, getSize, nextWallpaper };

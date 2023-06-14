@@ -11,6 +11,8 @@ import {
   mdiPlay,
   mdiPause,
 } from "@mdi/js";
+// const { ipcRenderer } = window.require("electron");
+// const { ipcRenderer } = window;
 
 function App() {
   const [directories, setDirectories] = useState([]);
@@ -107,13 +109,7 @@ function App() {
   };
 
   const cycleWallpaper = async (event) => {
-    const prevState = processStart;
-    await stopPapetron(event);
-    await startPapetron(event);
-    if (prevState !== true) {
-      stopPapetron(event);
-    }
-    setProcessStart(prevState);
+    window.Papetron.cycleWallpaper();
   };
 
   return (

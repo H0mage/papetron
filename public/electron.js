@@ -2,9 +2,15 @@ const { app, BrowserWindow, ipcMain, screen, Tray, Menu } = require("electron");
 const path = require("path");
 const fs = require("fs");
 const { promisify } = require("util");
-const { getUserSettings, setUserSettings } = require("../src/settings");
-const { generateWallpaper, getSize } = require("../src/generateWallpaper");
 const Store = require("electron-store");
+const isDev = require("electron-is-dev");
+const { getUserSettings, setUserSettings } = require(`${
+  isDev ? "../electron/settings" : "./electron/settings"
+}`);
+const { generateWallpaper, getSize, nextWallpaper } = require(`${
+  isDev ? "../electron/generateWallpaper" : "./electron/generateWallpaper"
+}`);
+const log = require("electron-log");
 
 const storage = new Store();
 
@@ -61,7 +67,7 @@ function shuffleArray(array) {
 // Requests a generated collage wallpaper from another file and sets it as the wallpaper, reruns every timeInterval unless stopped
 async function changeWallpaper() {
   const settings = getUserSettings();
-  const { directories, isCollage, syncDisplays, maxCollage } = settings;
+  const { directories, isCollage, maxCollage } = settings;
   const displays = screen.getAllDisplays().map((e) => e.size);
   let fileList = [];
 
@@ -126,20 +132,35 @@ async function changeWallpaper() {
     }
     finalImage = metadata.path;
   } else {
-    finalImage = await generateWallpaper(display, collageImages);
+    finalImage = await generateWallpaper(
+      display,
+      collageImages,
+      path.join(app.getPath("temp"), "/papetron/tempWallpaper.png")
+    );
   }
 
+  win.webContents.send("message", finalImage);
+  log.info(finalImage);
+
   // Sets the wallpaper
-  import("wallpaper").then((wallpaper) => {
-    wallpaper
-      .setWallpaper(finalImage, { screen: displayCount })
-      .then(() => {
-        console.log("Success");
-      })
-      .catch((err) => {
-        console.log("Error:", err);
-      });
-  });
+  try {
+    // nextWallpaper(finalImage);
+    import("wallpaper").then((wallpaper) => {
+      wallpaper
+        .setWallpaper(finalImage, { screen: displayCount })
+        .then(() => {
+          console.log("Success");
+          log.info("success");
+        })
+        .catch((err) => {
+          console.log("Error:", err);
+          log.info(err);
+        });
+    });
+  } catch (err) {
+    console.log(err);
+    log.info(err);
+  }
 
   // Increment or reset targetDisplay for rotations
   if (displayCount === displays.length - 1) {
@@ -165,6 +186,11 @@ function createWindow() {
       storage.set("windowSize", { width, height });
     }
 
+    let preloadPath = path.join(
+      __dirname,
+      isDev ? "../electron/preload.js" : "./electron/preload.js"
+    );
+
     // Create the browser window.
     win = new BrowserWindow({
       width: width,
@@ -173,12 +199,16 @@ function createWindow() {
       webPreferences: {
         nodeIntegration: true,
         enableRemoteModule: true,
-        preload: path.join(__dirname, "preload.js"),
+        preload: preloadPath,
       },
     });
 
     //load the index.html from a url
-    win.loadURL("http://localhost:3000");
+    win.loadURL(
+      isDev
+        ? "http://localhost:3000"
+        : `file://${path.join(__dirname, "./index.html")}`
+    );
 
     // Open the DevTools.
     win.webContents.openDevTools();
@@ -214,12 +244,24 @@ function createWindow() {
 app.whenReady().then(() => {
   ipcMain.handle("settings", getUserSettings);
 
-  // Create the temp directory
-  fs.mkdir(path.join(__dirname, "../", "temp"), { recursive: true }, (err) => {
-    if (err) throw err;
-  });
+  if (isDev) {
+    console.log(app.getPath("temp"));
+    // Create the temp directory
+    fs.mkdir(path.join(__dirname, "../temp"), { recursive: true }, (err) => {
+      if (err) throw err;
+    });
+    tray = new Tray(path.join(__dirname, "../public/icon.png"));
+  } else {
+    const newPath = app.getPath("temp") + "/papetron";
+    console.log(newPath);
+    if (!fs.existsSync(newPath)) {
+      fs.mkdir(newPath, (err) => {
+        if (err) throw err;
+      });
+    }
+    tray = new Tray(path.join(__dirname, "/icon.png"));
+  }
 
-  tray = new Tray(path.join(__dirname, "icon.png"));
   const contextMenu = Menu.buildFromTemplate([
     {
       label: "Show App",
@@ -317,4 +359,8 @@ ipcMain.on("settings:open", function (event, value) {
     browserWindow.setSize(width, height);
   }
   storage.set("windowSize", { width, height });
+});
+
+ipcMain.on("wallpaper:cycle", function (event) {
+  changeWallpaper();
 });

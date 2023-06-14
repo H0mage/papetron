@@ -1,5 +1,6 @@
 const { contextBridge, ipcRenderer } = require("electron");
 const Store = require("electron-store");
+window.ipcRenderer = ipcRenderer;
 
 const store = new Store();
 
