@@ -15,16 +15,12 @@
     "cross-env": "^7.0.3",
     "electron-is-dev": "^2.0.0",
     "electron-log": "^4.4.8",
-    "electron-squirrel-startup": "^1.0.0",
     "electron-store": "^8.1.0",
-    "esm": "^3.2.25",
-    "jimp": "^0.22.8",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
     "sharp": "^0.32.1",
-    "wallpaper": "^6.1.1",
-    "web-vitals": "^2.1.4"
+    "wallpaper": "^6.1.1"
   },
   "scripts": {
     "react-start": "cross-env BROWSER=none react-scripts start",
@@ -36,10 +32,7 @@
     "app:dir": "electron-builder --dir",
     "app:dist": "electron-builder -mwl",
     "postinstall": "electron-builder install-app-deps",
-    "start": "electron-forge start",
-    "package": "electron-forge package",
-    "make": "electron-forge make",
-    "e-package": "electron-builder build --win -c.extraMetadata.main=build/electron.js --publish never"
+    "e-package": "cross-env DEBUG=electron-builder electron-builder --win -c.extraMetadata.main=build/electron.js --publish never"
   },
   "eslintConfig": {
     "extends": [
@@ -60,11 +53,6 @@
     ]
   },
   "devDependencies": {
-    "@electron-forge/cli": "^6.1.1",
-    "@electron-forge/maker-deb": "^6.1.1",
-    "@electron-forge/maker-rpm": "^6.1.1",
-    "@electron-forge/maker-squirrel": "^6.1.1",
-    "@electron-forge/maker-zip": "^6.1.1",
     "electron": "^25.0.0",
     "electron-builder": "^23.6.0"
   },
@@ -84,6 +72,10 @@
     "appId": "com.electron.papetron",
     "mac": {
       "category": "public.app-category.utilities"
+    },
+    "win": {
+      "target": "nsis"
     }
-  }
+  },
+  "postinstall": "electron-builder install-app-deps"
 }

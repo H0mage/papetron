@@ -11,6 +11,7 @@ import {
   mdiPlay,
   mdiPause,
 } from "@mdi/js";
+// import { ipcRenderer } from "electron";
 // const { ipcRenderer } = window.require("electron");
 // const { ipcRenderer } = window;
 
@@ -111,6 +112,14 @@ function App() {
   const cycleWallpaper = async (event) => {
     window.Papetron.cycleWallpaper();
   };
+
+  // window.IPC.ipcRenderer.on("process:start", function () {
+  //   setProcessStart(true);
+  // });
+
+  // window.IPC.ipcRenderer.on("process:stop", function () {
+  //   setProcessStart(false);
+  // });
 
   return (
     <div className="container">

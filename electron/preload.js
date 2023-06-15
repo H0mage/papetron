@@ -4,6 +4,10 @@ window.ipcRenderer = ipcRenderer;
 
 const store = new Store();
 
+contextBridge.exposeInMainWorld("IPC", {
+  ipcRenderer,
+});
+
 // To Persist settings
 contextBridge.exposeInMainWorld("Settings", {
   directories: () => store.get("directories"),
@@ -27,6 +31,9 @@ contextBridge.exposeInMainWorld("Papetron", {
   stop: () => {
     ipcRenderer.send("papetron:stop");
     store.set("isRunning", false);
+  },
+  cycleWallpaper: () => {
+    ipcRenderer.send("wallpaper:cycle");
   },
   isRunning: () => store.get("isRunning"),
 });

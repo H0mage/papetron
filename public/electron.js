@@ -4,10 +4,11 @@ const fs = require("fs");
 const { promisify } = require("util");
 const Store = require("electron-store");
 const isDev = require("electron-is-dev");
+
 const { getUserSettings, setUserSettings } = require(`${
   isDev ? "../electron/settings" : "./electron/settings"
 }`);
-const { generateWallpaper, getSize, nextWallpaper } = require(`${
+const { generateWallpaper, getSize } = require(`${
   isDev ? "../electron/generateWallpaper" : "./electron/generateWallpaper"
 }`);
 const log = require("electron-log");
@@ -29,6 +30,7 @@ let displayCount = 0;
 let instanceFileList;
 
 function papetronStart() {
+  win.webContents.send("process:start");
   if (intervalId) {
     clearInterval(intervalId);
   }
@@ -40,6 +42,7 @@ function papetronStart() {
 }
 
 function papetronStop() {
+  win.webContents.send("process:stop");
   clearInterval(intervalId);
 }
 
@@ -144,7 +147,8 @@ async function changeWallpaper() {
 
   // Sets the wallpaper
   try {
-    // nextWallpaper(finalImage);
+    // window.wallpaper.setWallpaper(finalImage);
+    // setWallpaper(finalImage);
     import("wallpaper").then((wallpaper) => {
       wallpaper
         .setWallpaper(finalImage, { screen: displayCount })
@@ -157,6 +161,7 @@ async function changeWallpaper() {
           log.info(err);
         });
     });
+    // win.webContents.send("wallpaper:change", finalImage);
   } catch (err) {
     console.log(err);
     log.info(err);
@@ -171,6 +176,7 @@ async function changeWallpaper() {
 }
 
 function createWindow() {
+  console.log(win);
   if (win === null) {
     const settings = getUserSettings();
 
@@ -198,7 +204,10 @@ function createWindow() {
       autoHideMenuBar: true,
       webPreferences: {
         nodeIntegration: true,
-        enableRemoteModule: true,
+        backgroundThrottling: false,
+        // contextIsolation: true,
+        // nodeIntegration: true,
+        // enableRemoteModule: true,
         preload: preloadPath,
       },
     });
@@ -218,11 +227,11 @@ function createWindow() {
       storage.set("windowSize", { width: size[0], height: size[1] });
     });
 
-    win.on("minimize", function (event) {
-      event.preventDefault();
-      win.hide();
-      win = null;
-    });
+    // win.on("minimize", function (event) {
+    //   event.preventDefault();
+    //   win.hide();
+    //   win = null;
+    // });
 
     win.on("close", function (event) {
       const settings = getUserSettings();
@@ -232,9 +241,11 @@ function createWindow() {
       } else {
         event.preventDefault();
         win.hide();
-        win = null;
+        // win = null;
       }
     });
+  } else {
+    win.show();
   }
 }
 
@@ -291,7 +302,7 @@ app.whenReady().then(() => {
       label: "Quit",
       click: function () {
         app.isQuiting = true;
-        win = null;
+        // win = null;
         app.quit();
       },
     },

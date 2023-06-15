@@ -1,4 +1,3 @@
-import { setWallpaper } from "wallpaper";
 const path = require("path");
 const sharp = require("sharp");
 const isDev = require("electron-is-dev");
@@ -519,8 +518,4 @@ async function generateWallpaper(display, imagePaths, imagePath) {
   return outputPath;
 }
 
-function nextWallpaper(path) {
-  setWallpaper(path);
-}
-
-module.exports = { generateWallpaper, getSize, nextWallpaper };
+module.exports = { generateWallpaper, getSize };
