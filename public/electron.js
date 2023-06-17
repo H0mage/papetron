@@ -245,7 +245,6 @@ app.whenReady().then(() => {
     tray = new Tray(path.join(__dirname, "../public/icon.png"));
   } else {
     const newPath = app.getPath("temp") + "/papetron";
-    console.log(newPath);
     if (!fs.existsSync(newPath)) {
       fs.mkdir(newPath, (err) => {
         if (err) throw err;

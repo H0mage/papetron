@@ -20,7 +20,7 @@ function App() {
   const [timeInterval, setTimeInterval] = useState("");
   const [isCollage, setIsCollage] = useState(false);
   const [syncDisplays, setSyncDisplays] = useState(false);
-  const [maxCollage, setMaxCollage] = useState(6);
+  const [maxCollage, setMaxCollage] = useState("");
   const [keepRunning, setKeepRunning] = useState(true);
   const [processStart, setProcessStart] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -33,7 +33,7 @@ function App() {
       setIsCollage(window.Settings.isCollage);
       setSyncDisplays(window.Settings.syncDisplays);
       setMaxCollage(window.Settings.maxCollage);
-      setKeepRunning(window.Settings.keepRunning);
+      setKeepRunning(window.Settings.keepRunning || true);
       setProcessStart(window.Papetron.isRunning);
     }
   }, []);

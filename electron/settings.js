@@ -27,7 +27,7 @@ function getUserSettings() {
       timeInterval: 50000,
       isCollage: true,
       syncDisplays: false,
-      maxCollage: 6,
+      maxCollage: "6",
       keepRunning: true,
     };
     storage.set("directories", defaultSettings.directories);
