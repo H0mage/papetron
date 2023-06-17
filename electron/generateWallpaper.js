@@ -2,31 +2,31 @@ const path = require("path");
 const sharp = require("sharp");
 const isDev = require("electron-is-dev");
 
-const positions = [
-  "centre",
-  "top",
-  "right top",
-  "right",
-  "right bottom",
-  "bottom",
-  "left bottom",
-  "left",
-  "left top",
-];
+// const positions = [
+//   "centre",
+//   "top",
+//   "right top",
+//   "right",
+//   "right bottom",
+//   "bottom",
+//   "left bottom",
+//   "left",
+//   "left top",
+// ];
 
-const gravities = [
-  "north",
-  "northeast",
-  "east",
-  "southeast",
-  "south",
-  "southwest",
-  "west",
-  "northwest",
-  "center",
-];
+// const gravities = [
+//   "north",
+//   "northeast",
+//   "east",
+//   "southeast",
+//   "south",
+//   "southwest",
+//   "west",
+//   "northwest",
+//   "center",
+// ];
 
-const strategies = ["entropy", "attention"];
+const strategies = [sharp.position.entropy, sharp.position.attention];
 
 function compare(a, b) {
   if (a.ratio < b.ratio) {
@@ -57,9 +57,9 @@ async function getSize(imagePath) {
     orientation = "horizontal";
   }
 
-  const position = chooseRandom(0, positions.length - 1);
-  const gravity = chooseRandom(0, gravities.length - 1);
-  const strategy = chooseRandom(0, strategies.length - 1);
+  // const position = chooseRandom(0, positions.length - 1);
+  // const gravity = chooseRandom(0, gravities.length - 1);
+  const position = chooseRandom(0, strategies.length - 1);
 
   return {
     width,
@@ -67,9 +67,9 @@ async function getSize(imagePath) {
     orientation,
     ratio,
     path: imagePath,
+    // position,
+    // gravity,
     position,
-    gravity,
-    strategy,
   };
 }
 
@@ -112,7 +112,7 @@ async function generateWallpaper(display, imagePaths, imagePath) {
           height: display.height,
           // position: sizeArray[3].position,
           // // gravity: sizeArray[3].gravity,
-          strategy: sizeArray[3].strategy,
+          position: sizeArray[3].position,
         })
         .png({ quality: 100 })
         .toBuffer();
@@ -123,7 +123,7 @@ async function generateWallpaper(display, imagePaths, imagePath) {
           height: display.height,
           // position: sizeArray[0].position,
           // // gravity: sizeArray[0].gravity,
-          strategy: sizeArray[0].strategy,
+          position: sizeArray[0].position,
         })
         .png({ quality: 100 })
         .toBuffer();
@@ -166,7 +166,7 @@ async function generateWallpaper(display, imagePaths, imagePath) {
           height: display.height,
           // position: sizeArray[3].position,
           // // gravity: sizeArray[3].gravity,
-          strategy: sizeArray[3].strategy,
+          position: sizeArray[3].position,
         })
         .png({ quality: 100 })
         .toBuffer();
@@ -177,7 +177,7 @@ async function generateWallpaper(display, imagePaths, imagePath) {
           height: img_2_height,
           // position: sizeArray[4].position,
           // // gravity: sizeArray[4].gravity,
-          strategy: sizeArray[4].strategy,
+          position: sizeArray[4].position,
         })
         .png({ quality: 100 })
         .toBuffer();
@@ -188,7 +188,7 @@ async function generateWallpaper(display, imagePaths, imagePath) {
           height: img_3_height,
           // position: sizeArray[5].position,
           // // gravity: sizeArray[5].gravity,
-          strategy: sizeArray[5].strategy,
+          position: sizeArray[5].position,
         })
         .png({ quality: 100 })
         .toBuffer();
@@ -234,7 +234,7 @@ async function generateWallpaper(display, imagePaths, imagePath) {
           height: img_1_height,
           // position: sizeArray[4].position,
           // gravity: sizeArray[4].gravity,
-          strategy: sizeArray[4].strategy,
+          position: sizeArray[4].position,
         })
         .png({ quality: 100 })
         .toBuffer();
@@ -245,7 +245,7 @@ async function generateWallpaper(display, imagePaths, imagePath) {
           height: img_1_height,
           // position: sizeArray[5].position,
           // gravity: sizeArray[5].gravity,
-          strategy: sizeArray[5].strategy,
+          position: sizeArray[5].position,
         })
         .png({ quality: 100 })
         .toBuffer();
@@ -256,7 +256,7 @@ async function generateWallpaper(display, imagePaths, imagePath) {
           height: img_3_height,
           // position: sizeArray[7].position,
           // // gravity: sizeArray[7].gravity,
-          strategy: sizeArray[7].strategy,
+          position: sizeArray[7].position,
         })
         .png({ quality: 100 })
         .toBuffer();
@@ -267,7 +267,7 @@ async function generateWallpaper(display, imagePaths, imagePath) {
           height: display.height,
           // position: sizeArray[0].position,
           // // gravity: sizeArray[0].gravity,
-          strategy: sizeArray[0].strategy,
+          position: sizeArray[0].position,
         })
         .png({ quality: 100 })
         .toBuffer();
@@ -316,7 +316,7 @@ async function generateWallpaper(display, imagePaths, imagePath) {
           height: section_3_height,
           // position: sizeArray[4].position,
           // // gravity: sizeArray[4].gravity,
-          strategy: sizeArray[4].strategy,
+          position: sizeArray[4].position,
         })
         .png({ quality: 100 })
         .toBuffer();
@@ -327,7 +327,7 @@ async function generateWallpaper(display, imagePaths, imagePath) {
           height: section_3_height,
           // position: sizeArray[5].position,
           // // gravity: sizeArray[5].gravity,
-          strategy: sizeArray[5].strategy,
+          position: sizeArray[5].position,
         })
         .png({ quality: 100 })
         .toBuffer();
@@ -338,7 +338,7 @@ async function generateWallpaper(display, imagePaths, imagePath) {
           height: img_3_height,
           // position: sizeArray[9].position,
           // // gravity: sizeArray[9].gravity,
-          strategy: sizeArray[9].strategy,
+          position: sizeArray[9].position,
         })
         .png({ quality: 100 })
         .toBuffer();
@@ -349,7 +349,7 @@ async function generateWallpaper(display, imagePaths, imagePath) {
           height: img_4_height,
           // position: sizeArray[6].position,
           // // gravity: sizeArray[6].gravity,
-          strategy: sizeArray[6].strategy,
+          position: sizeArray[6].position,
         })
         .png({ quality: 100 })
         .toBuffer();
@@ -360,7 +360,7 @@ async function generateWallpaper(display, imagePaths, imagePath) {
           height: img_5_height,
           // position: sizeArray[8].position,
           // // gravity: sizeArray[8].gravity,
-          strategy: sizeArray[8].strategy,
+          position: sizeArray[8].position,
         })
         .png({ quality: 100 })
         .toBuffer();
@@ -414,7 +414,7 @@ async function generateWallpaper(display, imagePaths, imagePath) {
           height: section_3_height,
           // position: sizeArray[0].position,
           // // gravity: sizeArray[0].gravity,
-          strategy: sizeArray[0].strategy,
+          position: sizeArray[0].position,
         })
         .png({ quality: 100 })
         .toBuffer();
@@ -425,7 +425,7 @@ async function generateWallpaper(display, imagePaths, imagePath) {
           height: section_3_height,
           // position: sizeArray[7].position,
           // // gravity: sizeArray[7].gravity,
-          strategy: sizeArray[7].strategy,
+          position: sizeArray[7].position,
         })
         .png({ quality: 100 })
         .toBuffer();
@@ -436,7 +436,7 @@ async function generateWallpaper(display, imagePaths, imagePath) {
           height: img_3_height,
           // position: sizeArray[11].position,
           // // gravity: sizeArray[11].gravity,
-          strategy: sizeArray[11].strategy,
+          position: sizeArray[11].position,
         })
         .png({ quality: 100 })
         .toBuffer();
@@ -447,7 +447,7 @@ async function generateWallpaper(display, imagePaths, imagePath) {
           height: img_4_height,
           // position: sizeArray[9].position,
           // // gravity: sizeArray[9].gravity,
-          strategy: sizeArray[9].strategy,
+          position: sizeArray[9].position,
         })
         .png({ quality: 100 })
         .toBuffer();
@@ -458,7 +458,7 @@ async function generateWallpaper(display, imagePaths, imagePath) {
           height: section_4_height,
           // position: sizeArray[2].position,
           // // gravity: sizeArray[2].gravity,
-          strategy: sizeArray[2].strategy,
+          position: sizeArray[2].position,
         })
         .png({ quality: 100 })
         .toBuffer();
@@ -469,7 +469,7 @@ async function generateWallpaper(display, imagePaths, imagePath) {
           height: section_4_height,
           // position: sizeArray[].position,
           // // gravity: sizeArray[1].gravity,
-          strategy: sizeArray[1].strategy,
+          position: sizeArray[1].position,
         })
         .png({ quality: 100 })
         .toBuffer();

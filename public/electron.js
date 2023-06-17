@@ -12,6 +12,7 @@ const { generateWallpaper, getSize } = require(`${
   isDev ? "../electron/generateWallpaper" : "./electron/generateWallpaper"
 }`);
 const log = require("electron-log");
+const wallpaper = require("wallpaper");
 
 const storage = new Store();
 
@@ -59,13 +60,13 @@ function compare(a, b) {
 function chooseRandom(min, max) {
   return Math.floor(Math.random() * (parseInt(max) - min + 1) + min);
 }
-
-function shuffleArray(array) {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-}
+// For extra variance, not really needed
+// function shuffleArray(array) {
+//   for (let i = array.length - 1; i > 0; i--) {
+//     const j = Math.floor(Math.random() * (i + 1));
+//     [array[i], array[j]] = [array[j], array[i]];
+//   }
+// }
 
 // Requests a generated collage wallpaper from another file and sets it as the wallpaper, reruns every timeInterval unless stopped
 async function changeWallpaper() {
@@ -93,7 +94,7 @@ async function changeWallpaper() {
       fileList = [...fileList, ...filtered];
     }
     // Shuffles the array for just a dash more RNG
-    shuffleArray(fileList);
+    // shuffleArray(fileList);
     instanceFileList = [...fileList];
   }
 
@@ -142,26 +143,9 @@ async function changeWallpaper() {
     );
   }
 
-  win.webContents.send("message", finalImage);
-  log.info(finalImage);
-
   // Sets the wallpaper
   try {
-    // window.wallpaper.setWallpaper(finalImage);
-    // setWallpaper(finalImage);
-    import("wallpaper").then((wallpaper) => {
-      wallpaper
-        .setWallpaper(finalImage, { screen: displayCount })
-        .then(() => {
-          console.log("Success");
-          log.info("success");
-        })
-        .catch((err) => {
-          console.log("Error:", err);
-          log.info(err);
-        });
-    });
-    // win.webContents.send("wallpaper:change", finalImage);
+    await wallpaper.set(finalImage, { screen: displayCount });
   } catch (err) {
     console.log(err);
     log.info(err);
@@ -176,7 +160,6 @@ async function changeWallpaper() {
 }
 
 function createWindow() {
-  console.log(win);
   if (win === null) {
     const settings = getUserSettings();
 
@@ -205,9 +188,6 @@ function createWindow() {
       webPreferences: {
         nodeIntegration: true,
         backgroundThrottling: false,
-        // contextIsolation: true,
-        // nodeIntegration: true,
-        // enableRemoteModule: true,
         preload: preloadPath,
       },
     });
@@ -220,7 +200,9 @@ function createWindow() {
     );
 
     // Open the DevTools.
-    win.webContents.openDevTools();
+    if (isDev) {
+      win.webContents.openDevTools();
+    }
 
     win.on("resize", function () {
       let size = win.getSize();
@@ -256,7 +238,6 @@ app.whenReady().then(() => {
   ipcMain.handle("settings", getUserSettings);
 
   if (isDev) {
-    console.log(app.getPath("temp"));
     // Create the temp directory
     fs.mkdir(path.join(__dirname, "../temp"), { recursive: true }, (err) => {
       if (err) throw err;
@@ -340,10 +321,6 @@ app.on("activate", () => {
 ipcMain.on("save:settings", function (event, formData) {
   instanceFileList = [];
   setUserSettings(formData);
-});
-
-ipcMain.on("settings:saved", function (event, message) {
-  // console.log(getUserSettings());
 });
 
 ipcMain.on("papetron:start", function (event) {

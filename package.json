@@ -1,6 +1,6 @@
 {
   "name": "papetron",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "main": "./public/electron.js",
   "author": "John Cabrera",
@@ -20,19 +20,19 @@
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
     "sharp": "^0.32.1",
-    "wallpaper": "^6.1.1"
+    "wallpaper": "^4.4.0"
   },
   "scripts": {
-    "react-start": "cross-env BROWSER=none react-scripts start",
+    "react-dev": "cross-env BROWSER=none react-scripts start",
+    "electron-dev": "electron .",
     "build": "react-scripts build",
     "build-electron": "robocopy electron build/electron /S",
+    "package": "cross-env DEBUG=electron-builder electron-builder --win -c.extraMetadata.main=build/electron.js --publish never",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "electron-dev": "electron .",
     "app:dir": "electron-builder --dir",
     "app:dist": "electron-builder -mwl",
-    "postinstall": "electron-builder install-app-deps",
-    "e-package": "cross-env DEBUG=electron-builder electron-builder --win -c.extraMetadata.main=build/electron.js --publish never"
+    "postinstall": "electron-builder install-app-deps"
   },
   "eslintConfig": {
     "extends": [

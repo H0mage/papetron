@@ -4,10 +4,6 @@ window.ipcRenderer = ipcRenderer;
 
 const store = new Store();
 
-contextBridge.exposeInMainWorld("IPC", {
-  ipcRenderer,
-});
-
 // To Persist settings
 contextBridge.exposeInMainWorld("Settings", {
   directories: () => store.get("directories"),
