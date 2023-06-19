@@ -27,7 +27,7 @@
     "electron-dev": "electron .",
     "build": "react-scripts build",
     "build-electron": "robocopy electron build/electron /S",
-    "package": "cross-env DEBUG=electron-builder electron-builder --win -c.extraMetadata.main=build/electron.js --publish never",
+    "package": "electron-builder --win -c.extraMetadata.main=build/electron.js --publish never",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "app:dir": "electron-builder --dir",

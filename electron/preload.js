@@ -22,11 +22,9 @@ contextBridge.exposeInMainWorld("Settings", {
 contextBridge.exposeInMainWorld("Papetron", {
   start: () => {
     ipcRenderer.send("papetron:start");
-    store.set("isRunning", true);
   },
   stop: () => {
     ipcRenderer.send("papetron:stop");
-    store.set("isRunning", false);
   },
   cycleWallpaper: () => {
     ipcRenderer.send("wallpaper:cycle");

@@ -30,20 +30,28 @@ let displayCount = 0;
 // To keep a memory of the fileList of all the possible image paths to select, refreshes on settings change or start
 let instanceFileList;
 
-function papetronStart() {
-  win.webContents.send("process:start");
+async function papetronStart() {
+  const isRunning = storage.get("isRunning");
+  if (isRunning) {
+    return null;
+  }
   if (intervalId) {
     clearInterval(intervalId);
   }
   instanceFileList = [];
   const settings = getUserSettings();
   const { timeInterval } = settings;
+  storage.set("isRunning", true);
   changeWallpaper();
   intervalId = setInterval(changeWallpaper, timeInterval);
 }
 
-function papetronStop() {
-  win.webContents.send("process:stop");
+async function papetronStop() {
+  const isRunning = storage.get("isRunning");
+  if (!isRunning) {
+    return null;
+  }
+  storage.set("isRunning", false);
   clearInterval(intervalId);
 }
 
@@ -160,7 +168,7 @@ async function changeWallpaper() {
 }
 
 function createWindow() {
-  if (win === null) {
+  if (BrowserWindow.getAllWindows().length === 0) {
     const settings = getUserSettings();
 
     const displays = screen.getAllDisplays().map((e) => e.size);
@@ -217,17 +225,14 @@ function createWindow() {
 
     win.on("close", function (event) {
       const settings = getUserSettings();
-      if (settings.keepRunning !== true || win === null) {
-        app.quit();
-        return;
-      } else {
+      if (settings.keepRunning && !app.isQuiting) {
         event.preventDefault();
-        win.hide();
-        // win = null;
+        win.destroy();
+        win = null;
+      } else {
+        app.quit();
       }
     });
-  } else {
-    win.show();
   }
 }
 
@@ -282,7 +287,6 @@ app.whenReady().then(() => {
       label: "Quit",
       click: function () {
         app.isQuiting = true;
-        // win = null;
         app.quit();
       },
     },
@@ -301,7 +305,7 @@ app.whenReady().then(() => {
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") {
+  if (process.platform !== "darwin" && storage.get("keepRunning") === false) {
     app.quit();
   }
 });
@@ -318,8 +322,13 @@ app.on("activate", () => {
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
 ipcMain.on("save:settings", function (event, formData) {
+  const isRunning = storage.get("isRunning");
   instanceFileList = [];
   setUserSettings(formData);
+  if (isRunning) {
+    papetronStop();
+    papetronStart();
+  }
 });
 
 ipcMain.on("papetron:start", function (event) {

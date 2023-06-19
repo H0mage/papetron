@@ -10,7 +10,6 @@
 
 .settings-container{
   background-color: rgb(18, 122, 99);
-  padding: 0.5rem;
   display: flex;
   flex-direction: column;
 }
@@ -28,6 +27,12 @@
   flex-direction: row;
   justify-content: space-between;
   font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.5rem;
+}
+
+.settings-title:hover{
+  background-color: rgb(15, 90, 73);
 }
 
 .directories-container{
@@ -47,6 +52,12 @@
   margin-bottom: 1rem;
 }
 
+.options-container{
+  display: flex;
+  flex-direction: column;
+  padding: 0 1rem;
+}
+
 .directory-item{
   display: flex;
   flex-direction: row;
@@ -56,6 +67,7 @@
   padding: 0.25rem 0.5rem;
   background-color: rgb(46, 74, 68);
   vertical-align: baseline;
+  
 }
 
 .item-text{
@@ -113,11 +125,26 @@
   border-radius: 0.7rem;
   border: none;
   cursor: pointer;
-  margin-top: 1rem;
+  max-width: fit-content;
+  margin: 1rem 0;
 }
 
 .button-save:hover{
   background-color: rgb(126, 185, 37);
+}
+
+.button-save-disabled{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background-color: grey;
+  color: rgb(181, 178, 178);
+  border-radius: 0.7rem;
+  border: none;
+  cursor: not-allowed;
+  max-width: fit-content;
+  margin: 1rem 0;
 }
 
 .papetron-controls{
@@ -140,6 +167,7 @@
 .button-start:hover{
   background-color:rgb(1, 156, 228);
 }
+
 
 .next-wallpaper{
   height: 4.5rem;

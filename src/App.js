@@ -11,9 +11,6 @@ import {
   mdiPlay,
   mdiPause,
 } from "@mdi/js";
-// import { ipcRenderer } from "electron";
-// const { ipcRenderer } = window.require("electron");
-// const { ipcRenderer } = window;
 
 function App() {
   const [directories, setDirectories] = useState([]);
@@ -24,6 +21,8 @@ function App() {
   const [keepRunning, setKeepRunning] = useState(true);
   const [processStart, setProcessStart] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [directoryLoading, setDirectoryLoading] = useState(false);
+  const [formChanged, setFormChanged] = useState(false);
   const hiddenFileInput = useRef(null);
 
   useEffect(() => {
@@ -39,15 +38,19 @@ function App() {
   }, []);
 
   const handleDirectoryChange = (event) => {
+    setFormChanged(true);
+    event.preventDefault();
     const directory = event.target.files[0].path.split("\\");
     directory.pop();
     const finalPath = directory.join("\\");
     event.target.value = null;
     event.target.files = null;
     setDirectories([...directories, finalPath]);
+    setDirectoryLoading(false);
   };
 
   const handleSelect = (event) => {
+    setFormChanged(true);
     if (event.target.name === "timeInterval") {
       setTimeInterval(event.target.value);
     } else if (event.target.name === "maxCollage") {
@@ -56,6 +59,7 @@ function App() {
   };
 
   const handleCheck = (event) => {
+    setFormChanged(true);
     if (event.target.name === "isCollage") {
       setIsCollage(event.target.checked);
     } else if (event.target.name === "syncDisplays") {
@@ -65,7 +69,7 @@ function App() {
     }
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const formData = {
       directories,
@@ -75,25 +79,32 @@ function App() {
       maxCollage,
       keepRunning,
     };
-    window.Settings.saveSettings(formData);
+    await window.Settings.saveSettings(formData);
+
+    setFormChanged(false);
   };
 
   const removeDirectoryHandler = (index) => {
+    setFormChanged(true);
     const directoriesCopy = directories.slice();
     directoriesCopy.splice(index, 1);
     setDirectories(directoriesCopy);
   };
 
   const startPapetron = (event) => {
-    event.preventDefault();
-    setProcessStart(true);
-    window.Papetron.start();
+    if (!processStart) {
+      event.preventDefault();
+      setProcessStart(true);
+      window.Papetron.start();
+    }
   };
 
   const stopPapetron = (event) => {
-    event.preventDefault();
-    setProcessStart(false);
-    window.Papetron.stop();
+    if (processStart) {
+      event.preventDefault();
+      setProcessStart(false);
+      window.Papetron.stop();
+    }
   };
 
   const handleMenu = (event) => {
@@ -106,6 +117,7 @@ function App() {
   };
 
   const triggerDirectorySearch = () => {
+    setDirectoryLoading(true);
     hiddenFileInput.current.click();
   };
 
@@ -169,60 +181,64 @@ function App() {
                   className="add-item"
                   onClick={triggerDirectorySearch}
                 >
-                  <Icon
-                    path={mdiFolderPlus}
-                    size={"1.5rem"}
-                    className="add-icon"
-                  />
+                  {directoryLoading ? (
+                    <div className="add-icon">Loading...</div>
+                  ) : (
+                    <Icon
+                      path={mdiFolderPlus}
+                      size={"1.5rem"}
+                      className="add-icon"
+                    />
+                  )}
                 </li>
               </div>
             </div>
-
-            <div className="form-item">
-              <label>Time Interval:</label>
-              <select
-                name="timeInterval"
-                defaultValue="30000"
-                onChange={handleSelect}
-                value={timeInterval}
-              >
-                <option value="5000">5 Seconds</option>
-                <option value="10000">10 Seconds</option>
-                <option value="30000">30 Seconds</option>
-                <option value="60000">1 Minute</option>
-                <option value="300000">5 Minutes</option>
-                <option value="600000">10 Minutes</option>
-                <option value="1800000">30 Minutes</option>
-                <option value="3600000">1 Hour</option>
-              </select>
-            </div>
-            <div className="form-item">
-              <label>Collage Images?</label>
-              <input
-                type="checkbox"
-                name="isCollage"
-                onChange={handleCheck}
-                checked={isCollage}
-              />
-            </div>
-            {isCollage && (
+            <div className="options-container">
               <div className="form-item">
-                <label>Max number of images per collage?</label>
+                <label>Time Interval:</label>
                 <select
-                  name="maxCollage"
-                  defaultValue="6"
+                  name="timeInterval"
+                  defaultValue="30000"
                   onChange={handleSelect}
-                  value={maxCollage}
+                  value={timeInterval}
                 >
-                  <option value="2">2</option>
-                  <option value="3">3</option>
-                  <option value="4">4</option>
-                  <option value="5">5</option>
-                  <option value="6">6</option>
+                  <option value="5000">5 Seconds</option>
+                  <option value="10000">10 Seconds</option>
+                  <option value="30000">30 Seconds</option>
+                  <option value="60000">1 Minute</option>
+                  <option value="300000">5 Minutes</option>
+                  <option value="600000">10 Minutes</option>
+                  <option value="1800000">30 Minutes</option>
+                  <option value="3600000">1 Hour</option>
                 </select>
               </div>
-            )}
-            {/* <div className="form-item">
+              <div className="form-item">
+                <label>Collage Images?</label>
+                <input
+                  type="checkbox"
+                  name="isCollage"
+                  onChange={handleCheck}
+                  checked={isCollage}
+                />
+              </div>
+              {isCollage && (
+                <div className="form-item">
+                  <label>Max number of images per collage?</label>
+                  <select
+                    name="maxCollage"
+                    defaultValue="6"
+                    onChange={handleSelect}
+                    value={maxCollage}
+                  >
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                  </select>
+                </div>
+              )}
+              {/* <div className="form-item">
               <label>Sync Displays?</label>
               <input
                 type="checkbox"
@@ -231,18 +247,26 @@ function App() {
                 checked={syncDisplays}
               />
             </div> */}
-            <div className="form-item">
-              <label>Minimize to tray on close?</label>
-              <input
-                type="checkbox"
-                name="keepRunning"
-                onChange={handleCheck}
-                checked={keepRunning}
-              />
+              <div className="form-item">
+                <label>Minimize to tray on close?</label>
+                <input
+                  type="checkbox"
+                  name="keepRunning"
+                  onChange={handleCheck}
+                  checked={keepRunning}
+                />
+              </div>
+              <button
+                type="submit"
+                value="Submit"
+                className={
+                  !formChanged ? "button-save-disabled" : "button-save"
+                }
+                disabled={!formChanged}
+              >
+                Save Settings
+              </button>
             </div>
-            <button type="submit" value="Submit" className="button-save">
-              Save Settings
-            </button>
           </form>
         )}
       </div>
