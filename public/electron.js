@@ -28,7 +28,7 @@ let intervalId;
 // For knowing how many displays there are in order to cycle which display changing wallpaper
 let displayCount = 0;
 // To keep a memory of the fileList of all the possible image paths to select, refreshes on settings change or start
-let instanceFileList;
+let instanceFileList = [];
 
 async function papetronStart() {
   const isRunning = storage.get("isRunning");
@@ -38,7 +38,6 @@ async function papetronStart() {
   if (intervalId) {
     clearInterval(intervalId);
   }
-  instanceFileList = [];
   const settings = getUserSettings();
   const { timeInterval } = settings;
   storage.set("isRunning", true);
@@ -51,6 +50,7 @@ async function papetronStop() {
   if (!isRunning) {
     return null;
   }
+  instanceFileList = [];
   storage.set("isRunning", false);
   clearInterval(intervalId);
 }
